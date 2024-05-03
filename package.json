@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "description": "## Description Taqtile's back end onboard project, wich consists on using the company's technology stack, patterns and practices to develop a server able to use CRUD (Create, Read, Update, Delete) to interact with a database (db).",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "compile": "tsc",
+    "start": "npm run compile && node ./dist/index.js"
   },
   "repository": {
     "type": "git",
@@ -17,9 +19,14 @@
   },
   "homepage": "https://github.com/indigotech/onboard-erick-sousa#readme",
   "dependencies": {
-    "express": "^4.19.2",
-    "graphql": "^16.8.1",
-    "graphql-http": "^1.22.1",
-    "ruru": "^2.0.0-beta.11"
+    "@apollo/server": "4.10.4",
+    "express": "4.19.2",
+    "graphql": "16.8.1",
+    "graphql-http": "1.22.1",
+    "ruru": "2.0.0-beta.11"
+  },
+  "devDependencies": {
+    "@types/node": "20.12.8",
+    "typescript": "5.4.5"
   }
 }
