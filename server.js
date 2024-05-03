@@ -1,4 +1,4 @@
-var express = require("express") // TODO: Search about ES and CommonJS modules
+var express = require("express")
 var { createHandler } = require("graphql-http/lib/use/express")
 var { buildSchema } = require("graphql")
 var { ruruHTML } = require("ruru/server")
@@ -7,7 +7,7 @@ var { ruruHTML } = require("ruru/server")
 // hello is a filed inside data. There is no object
 var schema = buildSchema(`
   type Query {
-    hello: String
+    hello: String!
   }
 `)
  
