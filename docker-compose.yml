@@ -1,0 +1,22 @@
+services:
+  localdb:
+    image: postgres:16.2
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/dumps:/app-db-dumps
+    environment:
+      - POSTGRES_USER=DAS_taq
+      - POSTGRES_PASSWORD=DAS_taki
+      - POSTGRES_DB=DAS_server_db
+
+  testdb:
+    image: postgres:16.2
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./db/dumps:/app-db-dumps
+    environment:
+      - POSTGRES_USER=DAS_taq
+      - POSTGRES_PASSWORD=DAS_taki
+      - POSTGRES_DB=DAS_server_tests_db
