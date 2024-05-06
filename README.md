@@ -1,12 +1,12 @@
-# DAS Server
+# :computer: DAS Server
 
-## Description
+## :pencil: Description
 Taqtile's back end onboard project, wich consists on using the company's technology stack, patterns and practices to develop a server able
 to use CRUD (Create, Read, Update, Delete) in order to interact with a database (db).
 
 Developed by Erick Diogo de Almeida Sousa (Erick DAS)
 
-## Environment and tools
+## :hammer: Environment and tools
 - **Environment operating system**
     - Ubuntu 20.04.6 LTS
 - **Database interaction code tools**
@@ -38,7 +38,7 @@ These are simple to manage with VSCode
 | [prettier](https://prettier.io/) | 3.2.5 |
 | [eslint-plugin-prettier](https://github.com/prettier/eslint-plugin-prettier) | 5.1.3 |
 
-## Steps to run and debug
+## :running: Steps to run and debug
 
 **Remember to run all the commands on the root of the directory**
 
