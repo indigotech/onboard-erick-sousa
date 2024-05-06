@@ -1,5 +1,5 @@
-import { ApolloServer } from '@apollo/server';
-import { startStandaloneServer } from '@apollo/server/standalone';
+import { ApolloServer } from '@apollo/server'
+import { startStandaloneServer } from '@apollo/server/standalone'
 
 const typeDefs = `#graphql
 
@@ -10,29 +10,29 @@ const typeDefs = `#graphql
   type Query {
     hello: [SimpleText]
   }
-`;
+`
 
-const Texts = [
+const texts = [
     {
-        content: 'Hello world!'
+        content: 'Hello world!',
     },
-];
+]
 
 const resolvers = {
     Query: {
-      hello: () => Texts,
+        hello: () => texts,
     },
-};
+}
 
 // Creating the ApolloServer is similar to express funtion createHandler
 const server = new ApolloServer({
     typeDefs,
     resolvers,
-  });
+})
 
-  const { url } = await startStandaloneServer(server, {
+const { url } = await startStandaloneServer(server, {
     listen: { port: 4000 },
-  });
-  
-  console.log(`🚀  Access server at: ${url}`);
-  
+})
+
+console.log(`🚀  Access server at: ${url}`)
+
