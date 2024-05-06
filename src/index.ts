@@ -1,5 +1,7 @@
 import { ApolloServer } from '@apollo/server'
 import { startStandaloneServer } from '@apollo/server/standalone'
+import { randomInt } from 'crypto'
+import { userInfo } from 'os'
 
 const typeDefs = `#graphql
 
@@ -9,6 +11,25 @@ const typeDefs = `#graphql
 
   type Query {
     hello: [SimpleText]
+  }
+
+  type Mutation  {
+    createUser(data: UserInput!): User
+  }
+
+  type User {
+    id: ID!
+    name: String
+    email: String
+    password: String
+    birthDate: String 
+  }
+
+  input UserInput {
+    name: String
+    email: String
+    password: String
+    birthDate: String 
   }
 `
 
@@ -21,6 +42,17 @@ const texts = [
 const resolvers = {
     Query: {
         hello: () => texts,
+    },
+    Mutation: {
+      createUser: async ({ user_input } ) => {
+        const user_info = {
+          id: randomInt(20),
+          name: user_input.name,
+          email: user_input.email,
+          birthDate: user_input.birthDate
+        }
+        return user_info;
+      },
     },
 }
 
