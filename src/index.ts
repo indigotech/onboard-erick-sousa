@@ -43,14 +43,14 @@ const resolvers = {
   },
   Mutation: {
     createUser: async ( _, args) => {
-      const user_input = args.data
-      const user_info = {
+      const userInput = args.data
+      const userInfo = {
         id: randomInt(20),
-        name: user_input.name,
-        email: user_input.email,
-        birthDate: user_input.birthDate,
+        name: userInput.name,
+        email: userInput.email,
+        birthDate: userInput.birthDate,
       }
-      return user_info
+      return userInfo
     },
   },
 }
