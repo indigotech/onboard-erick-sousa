@@ -1,7 +1,6 @@
 import { ApolloServer } from '@apollo/server'
 import { startStandaloneServer } from '@apollo/server/standalone'
 import { randomInt } from 'crypto'
-import { userInfo } from 'os'
 
 const typeDefs = `#graphql
 
@@ -34,36 +33,37 @@ const typeDefs = `#graphql
 `
 
 const texts = [
-    {
-        content: 'Hello world!',
-    },
+  {
+    content: 'Hello world!',
+  },
 ]
 
 const resolvers = {
-    Query: {
-        hello: () => texts,
+  Query: {
+    hello: () => texts,
+  },
+  Mutation: {
+    createUser: async ( _, args) => {
+      const user_input = args.data
+      const user_info = {
+        id: randomInt(20),
+        name: user_input.name,
+        email: user_input.email,
+        birthDate: user_input.birthDate,
+      }
+      return user_info
     },
-    Mutation: {
-      createUser: async ({ user_input } ) => {
-        const user_info = {
-          id: randomInt(20),
-          name: user_input.name,
-          email: user_input.email,
-          birthDate: user_input.birthDate
-        }
-        return user_info;
-      },
-    },
+  },
 }
 
 // Creating the ApolloServer is similar to express funtion createHandler
 const server = new ApolloServer({
-    typeDefs,
-    resolvers,
+  typeDefs,
+  resolvers,
 })
 
 const { url } = await startStandaloneServer(server, {
-    listen: { port: 4000 },
+  listen: { port: 4000 },
 })
 
 console.log(`🚀  Access server at: ${url}`)
