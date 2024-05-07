@@ -47,22 +47,27 @@ const resolvers = {
     createUser: async (_, args) => {
       const userInput = args.data
 
-      const user = await prisma.user.create({
-        data: {
-          name: userInput.name,
-          email: userInput.email,
-          password: userInput.password,
-          birthDate: userInput.birthDate,
-        },
-      })
-      const userInfo = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        birthDate: user.birthDate,
-      }
-
-      return userInfo
+      return prisma.user
+        .create({
+          data: {
+            name: userInput.name,
+            email: userInput.email,
+            password: userInput.password,
+            birthDate: userInput.birthDate,
+          },
+        })
+        .then((user) => {
+          const userInfo = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            birthDate: user.birthDate,
+          }
+          return userInfo
+        })
+        .catch((error) => {
+          throw new Error('Erro ao criar usuário: ' + error.message)
+        })
     },
   },
 }
