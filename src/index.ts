@@ -1,6 +1,7 @@
 import { ApolloServer } from '@apollo/server'
 import { startStandaloneServer } from '@apollo/server/standalone'
 import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcrypt'
 
 const prisma = new PrismaClient()
 
@@ -53,12 +54,21 @@ const resolvers = {
         )
       }
 
+      const passwordHash = await bcrypt
+        .genSalt(10)
+        .then((salt) => {
+          return bcrypt.hash(userInput.password, salt)
+        })
+        .catch((error) => {
+          throw new Error('Hash error: ' + error.message)
+        })
+
       return prisma.user
         .create({
           data: {
             name: userInput.name,
             email: userInput.email,
-            password: userInput.password,
+            password: passwordHash,
             birthDate: userInput.birthDate,
           },
         })
