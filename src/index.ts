@@ -1,6 +1,8 @@
 import { ApolloServer } from '@apollo/server'
 import { startStandaloneServer } from '@apollo/server/standalone'
-import { randomInt } from 'crypto'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 const typeDefs = `#graphql
 
@@ -42,15 +44,30 @@ const resolvers = {
     hello: () => texts,
   },
   Mutation: {
-    createUser: async ( _, args) => {
+    createUser: async (_, args) => {
       const userInput = args.data
-      const userInfo = {
-        id: randomInt(20),
-        name: userInput.name,
-        email: userInput.email,
-        birthDate: userInput.birthDate,
-      }
-      return userInfo
+
+      return prisma.user
+        .create({
+          data: {
+            name: userInput.name,
+            email: userInput.email,
+            password: userInput.password,
+            birthDate: userInput.birthDate,
+          },
+        })
+        .then((user) => {
+          const userInfo = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            birthDate: user.birthDate,
+          }
+          return userInfo
+        })
+        .catch((error) => {
+          throw new Error('Erro ao criar usuário: ' + error.message)
+        })
     },
   },
 }
