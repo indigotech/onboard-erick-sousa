@@ -13,7 +13,7 @@ const typeDefs = `#graphql
   }
 
   type Mutation  {
-    createUser(data: UserInput!): User
+    createUser(data: UserInput!): User!
   }
 
   type User {
