@@ -1,12 +1,6 @@
-import { startDb } from '../setup-db'
+import { prisma } from '../setup-db'
 import { texts } from './schema'
 import bcrypt from 'bcrypt'
-
-let prisma
-
-(async () => {
-  prisma = await startDb()
-})()
 
 export const resolvers = {
   Query: {

@@ -1,3 +1,3 @@
-import { startServer } from '../src/setup-server'
+import { setup } from '../src/setup'
 
-startServer()
+setup()
