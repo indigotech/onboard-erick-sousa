@@ -1,5 +1,5 @@
-import assert from 'assert'
 import { describe, it } from 'mocha'
+import assert from 'assert'
 
 describe('string lenght', function () {
   it('string lenght of sum should be equal to sum of string lenghts', function () {
