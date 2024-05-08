@@ -47,6 +47,12 @@ const resolvers = {
     createUser: async (_, args) => {
       const userInput = args.data
 
+      if (!isPasswordValid(userInput.password)) {
+        throw new Error(
+          'Password must have at least six characters, with at least one digit and one letter'
+        )
+      }
+
       return prisma.user
         .create({
           data: {
@@ -81,5 +87,11 @@ const server = new ApolloServer({
 const { url } = await startStandaloneServer(server, {
   listen: { port: 4000 },
 })
+
+function isPasswordValid(password: string): boolean {
+  return (
+    password.length >= 6 && /[0-9]/.test(password) && /[a-zA-Z]/.test(password)
+  )
+}
 
 console.log(`🚀  Access server at: ${url}`)
