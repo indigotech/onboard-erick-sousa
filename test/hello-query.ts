@@ -1,7 +1,7 @@
-import axios from 'axios'
-import assert from 'assert'
-import { describe, it, before, after } from 'mocha'
 import { startServer, stopServer } from '../src/setup-server'
+import { describe, it, before, after } from 'mocha'
+import axios from 'axios'
+import { expect } from 'chai'
 
 describe('hello query test', function () {
   before(async function () {
@@ -22,6 +22,7 @@ describe('hello query test', function () {
         }
       `,
     })
-    assert.equal(response.data.data.hello[0].content, 'Hello world!')
+    const content = response.data.data.hello[0].content
+    expect(content).to.be.equal('Hello world!')
   })
 })
