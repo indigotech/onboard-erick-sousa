@@ -5,21 +5,25 @@ import { prisma } from '../src/setup-db'
 import { describe, it, before, after } from 'mocha'
 import { expect } from 'chai'
 
-describe('Server/database setup and GraphQL tests/n', function () {
+describe('Server/database setup and GraphQL test\n', function () {
+  let createdUserId
+
   before(async function () {
     await setup()
   })
 
   after(async function () {
-    await prisma.user.delete({
-      where: {
-        email: test_input.data.email,
-      },
-    })
+    if (createdUserId) {
+      await prisma.user.delete({
+        where: {
+          email: test_input.data.email,
+        },
+      })
+    }
     await stopServer()
   })
 
-  it('Should return "Hello world!"/n', async function () {
+  it('Should return "Hello world!"\n', async function () {
     const response = await axios.post('http://localhost:4000', {
       query: `
         query {
@@ -67,6 +71,7 @@ describe('Server/database setup and GraphQL tests/n', function () {
     console.log(response.data)
     expect(response.data.data).not.to.be.null
     expect(response.data.data.createUser.id).not.to.be.null
+    createdUserId = response.data.data.createUser.id
     expect(response.data.data.createUser).not.to.have.property('password')
     expect(response.data.data.createUser.birthDate).to.be.equal(
       test_input.data.birthDate

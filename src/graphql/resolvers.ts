@@ -2,6 +2,8 @@ import { prisma } from '../setup-db.js'
 import { texts } from './schema.js'
 import bcrypt from 'bcrypt'
 
+export let isEmailValid
+
 export const resolvers = {
   Query: {
     hello: () => texts,
@@ -14,6 +16,13 @@ export const resolvers = {
         throw new Error(
           'Password must have at least six characters, with at least one digit and one letter'
         )
+      }
+
+      await validateEmail(userInput.email)
+
+      console.log('\n \n EMAIL EH VALIDO? ' + isEmailValid + '\n \n')
+      if (!isEmailValid) {
+        throw new Error('There is already a user with the given email')
       }
 
       const passwordHash = await bcrypt
@@ -54,4 +63,18 @@ function isPasswordValid(password: string): boolean {
   return (
     password.length >= 6 && /[0-9]/.test(password) && /[a-zA-Z]/.test(password)
   )
+}
+
+async function validateEmail(email_input: string) {
+  const user = await prisma.user.findUnique({
+    where: {
+      email: email_input,
+    },
+  })
+
+  if (user) {
+    isEmailValid = false
+  } else {
+    isEmailValid = true
+  }
 }
