@@ -7,7 +7,10 @@
   "scripts": {
     "compile": "tsc",
     "start": "dotenv -e .env -- npm run compile && node ./dist/src/index.js",
-    "test": "dotenv -e .env.test -- mocha --require ts-node/register ./test/*.ts"
+    "test": "dotenv -e .env.test -- mocha --require ts-node/register ./test/*.ts",
+    "studio": "dotenv -e .env.test -- npx prisma studio",
+    "migrateDev": "dotenv -e .env -- npx prisma migrate deploy",
+    "migrateTest": "dotenv -e .env.test -- npx prisma migrate deploy"
   },
   "repository": {
     "type": "git",
@@ -31,6 +34,7 @@
     "express": "4.19.2",
     "graphql": "16.8.1",
     "graphql-http": "1.22.1",
+    "graphql-tag": "2.12.6",
     "ruru": "2.0.0-beta.11"
   },
   "devDependencies": {
