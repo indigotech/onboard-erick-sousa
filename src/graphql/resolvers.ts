@@ -2,8 +2,6 @@ import { prisma } from '../setup-db.js'
 import { texts } from './schema.js'
 import bcrypt from 'bcrypt'
 
-export let isEmailValid
-
 export const resolvers = {
   Query: {
     hello: () => texts,
@@ -18,10 +16,11 @@ export const resolvers = {
         )
       }
 
-      await validateEmail(userInput.email)
+      const isEmailAlreadyRegistered = await checkEmailAvailability(
+        userInput.email
+      )
 
-      console.log('\n \n EMAIL EH VALIDO? ' + isEmailValid + '\n \n')
-      if (!isEmailValid) {
+      if (isEmailAlreadyRegistered) {
         throw new Error('There is already a user with the given email')
       }
 
@@ -65,16 +64,12 @@ function isPasswordValid(password: string): boolean {
   )
 }
 
-async function validateEmail(email_input: string) {
+async function checkEmailAvailability(email_input: string) {
   const user = await prisma.user.findUnique({
     where: {
       email: email_input,
     },
   })
 
-  if (user) {
-    isEmailValid = false
-  } else {
-    isEmailValid = true
-  }
+  return !!user
 }
