@@ -42,7 +42,7 @@ describe('Server/database setup and GraphQL test\n', function () {
       name: 'test_name',
       email: 'test_email1',
       password: 'test_password1',
-      birthDate: 'test_birthdate',
+      birthDate: '01-01-1900',
     },
   }
 
