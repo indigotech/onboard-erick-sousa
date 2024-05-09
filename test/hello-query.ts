@@ -68,7 +68,6 @@ describe('Server/database setup and GraphQL test\n', function () {
       },
     })
 
-    console.log(response.data.data)
     const user = await prisma.user.findUnique({
       where: {
         email: test_input.data.email,
