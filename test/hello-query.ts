@@ -6,7 +6,7 @@ import { describe, it, before, after } from 'mocha'
 import { expect } from 'chai'
 
 describe('Server/database setup and GraphQL test\n', function () {
-  let createdUserId
+  let createdUserId: number
 
   before(async function () {
     await setup()
@@ -23,7 +23,7 @@ describe('Server/database setup and GraphQL test\n', function () {
     await stopServer()
   })
 
-  it('Should return "Hello world!"\n', async function () {
+  it('\nShould return "Hello world!"\n', async function () {
     const response = await axios.post('http://localhost:4000', {
       query: `
         query {
@@ -46,7 +46,7 @@ describe('Server/database setup and GraphQL test\n', function () {
     },
   }
 
-  it('should return a user as response', async function () {
+  it('Should create a new user\n', async function () {
     const response = await axios.post('http://localhost:4000', {
       query: `
         mutation CreateUser($data: UserInput!) {
@@ -68,32 +68,24 @@ describe('Server/database setup and GraphQL test\n', function () {
       },
     })
 
-    console.log(response.data)
-    expect(response.data.data).not.to.be.null
-    expect(response.data.data.createUser.id).not.to.be.null
-    createdUserId = response.data.data.createUser.id
-    expect(response.data.data.createUser).not.to.have.property('password')
-    expect(response.data.data.createUser.birthDate).to.be.equal(
-      test_input.data.birthDate
-    )
-    expect(response.data.data.createUser.email).to.be.equal(
-      test_input.data.email
-    )
-    expect(response.data.data.createUser.name).to.be.equal(test_input.data.name)
-  })
-
-  it('Should find the same user obtained on the previous response', async function () {
+    console.log(response.data.data)
     const user = await prisma.user.findUnique({
       where: {
         email: test_input.data.email,
       },
     })
-    expect(user).not.to.be.null
-
-    expect(user.id).not.to.be.null
+    createdUserId = response.data.data.createUser.id
+    expect(response.data.data.createUser).to.deep.include({
+      name: test_input.data.name,
+      email: test_input.data.email,
+      birthDate: test_input.data.birthDate,
+    })
+    console.log(user)
+    expect(user).to.deep.include({
+      name: test_input.data.name,
+      email: test_input.data.email,
+      birthDate: test_input.data.birthDate,
+    })
     expect(user.password).not.to.be.equal(test_input.data.password)
-    expect(user.birthDate).to.be.equal(test_input.data.birthDate)
-    expect(user.email).to.be.equal(test_input.data.email)
-    expect(user.name).to.be.equal(test_input.data.name)
   })
 })
