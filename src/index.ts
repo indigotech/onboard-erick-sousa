@@ -1,3 +1,3 @@
-import { setup } from '../src/setup'
+import setup from '../src/setup.js'
 
 setup()
