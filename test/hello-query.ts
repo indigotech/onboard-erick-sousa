@@ -1,11 +1,12 @@
-import { startServer, stopServer } from '../src/setup-server'
+import { stopServer } from '../src/setup-server'
+import setup from '../src/setup'
 import { describe, it, before, after } from 'mocha'
 import axios from 'axios'
 import { expect } from 'chai'
 
 describe('hello query test', function () {
   before(async function () {
-    await startServer()
+    await setup()
   })
 
   after(async function () {

@@ -1,5 +1,5 @@
-import { prisma } from '../setup-db'
-import { texts } from './schema'
+import { prisma } from '../setup-db.js'
+import { texts } from './schema.js'
 import bcrypt from 'bcrypt'
 
 export const resolvers = {
