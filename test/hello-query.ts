@@ -4,26 +4,19 @@ import { stopServer } from '../src/setup-server'
 import { prisma } from '../src/setup-db'
 import { describe, it, before, after } from 'mocha'
 import { expect } from 'chai'
+import bcrypt from 'bcrypt'
 
-describe('Server/database setup and GraphQL test\n', function () {
-  let createdUserId: number
-
+describe('Server/database setup and GraphQL test', function () {
   before(async function () {
     await setup()
   })
 
   after(async function () {
-    if (createdUserId) {
-      await prisma.user.delete({
-        where: {
-          email: test_input.data.email,
-        },
-      })
-    }
+    await prisma.user.deleteMany({})
     await stopServer()
   })
 
-  it('\nShould return "Hello world!"\n', async function () {
+  it('Should return "Hello world!"', async function () {
     const response = await axios.post('http://localhost:4000', {
       query: `
         query {
@@ -46,7 +39,7 @@ describe('Server/database setup and GraphQL test\n', function () {
     },
   }
 
-  it('Should create a new user\n', async function () {
+  it('Should create a new user', async function () {
     const response = await axios.post('http://localhost:4000', {
       query: `
         mutation CreateUser($data: UserInput!) {
@@ -73,18 +66,28 @@ describe('Server/database setup and GraphQL test\n', function () {
         email: test_input.data.email,
       },
     })
-    createdUserId = response.data.data.createUser.id
-    expect(response.data.data.createUser).to.deep.include({
+
+    expect(response.data.data.createUser).to.be.deep.eq({
       name: test_input.data.name,
       email: test_input.data.email,
       birthDate: test_input.data.birthDate,
+      id: String(user.id),
     })
-    console.log(user)
-    expect(user).to.deep.include({
+
+    const { password, ...userFields } = user
+
+    expect(userFields).to.be.deep.eq({
       name: test_input.data.name,
       email: test_input.data.email,
       birthDate: test_input.data.birthDate,
+      id: parseInt(response.data.data.createUser.id),
     })
-    expect(user.password).not.to.be.equal(test_input.data.password)
+
+    const passwordMatches = await bcrypt.compare(
+      test_input.data.password,
+      user.password
+    )
+
+    expect(passwordMatches).to.be.eq(true)
   })
 })
