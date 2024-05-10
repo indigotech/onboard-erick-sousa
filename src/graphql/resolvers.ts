@@ -16,6 +16,14 @@ export const resolvers = {
         )
       }
 
+      const isEmailAlreadyRegistered = await checkEmailAvailability(
+        userInput.email
+      )
+
+      if (isEmailAlreadyRegistered) {
+        throw new Error('There is already a user with the given email')
+      }
+
       const passwordHash = await bcrypt
         .genSalt(10)
         .then((salt) => {
@@ -54,4 +62,14 @@ function isPasswordValid(password: string): boolean {
   return (
     password.length >= 6 && /[0-9]/.test(password) && /[a-zA-Z]/.test(password)
   )
+}
+
+async function checkEmailAvailability(email_input: string) {
+  const user = await prisma.user.findUnique({
+    where: {
+      email: email_input,
+    },
+  })
+
+  return !!user
 }
