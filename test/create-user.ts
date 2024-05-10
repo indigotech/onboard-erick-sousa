@@ -78,7 +78,7 @@ describe('createUser mutation tests', function () {
         data: correctUserInfo.data,
       },
     })
-    console.log(response.data)
+
     expect(response.data.data).to.be.null
     expect(response.data.errors).to.be.deep.eq([
       {
