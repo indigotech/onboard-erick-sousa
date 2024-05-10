@@ -2,6 +2,7 @@ import { prisma } from '../setup-db.js'
 import { texts } from './schema.js'
 import { CustomError } from './error-handler.js'
 import bcrypt from 'bcrypt'
+import { User } from '@prisma/client'
 
 export const resolvers = {
   Query: {
@@ -57,6 +58,54 @@ export const resolvers = {
         return userInfo
       } catch (error) {
         throw new CustomError('Could not create user: ' + error.message, 500)
+      }
+    },
+
+    login: async (_, args) => {
+      const loginInput = args.data
+      let searchedUser: User
+
+      try {
+        searchedUser = await prisma.user.findUnique({
+          where: {
+            email: loginInput.email,
+          },
+        })
+      } catch (error) {
+        throw new CustomError(
+          'Could not find user: ' + error.message,
+          error.extensions.code
+        )
+      }
+
+      const passwordMatches: boolean = await bcrypt.compare(
+        loginInput.password,
+        searchedUser.password
+      )
+
+      if (!passwordMatches) {
+        throw new CustomError('Password does not match', 401)
+      } else {
+        try {
+          const userInfo = {
+            id: searchedUser.id,
+            name: searchedUser.name,
+            email: searchedUser.email,
+            birthDate: searchedUser.birthDate,
+          }
+          const token = ''
+          const loginResponse = {
+            user: userInfo,
+            token: token,
+          }
+
+          return loginResponse
+        } catch (error) {
+          throw new CustomError(
+            'Could not login: ' + error.message,
+            error.extensions.code
+          )
+        }
       }
     },
   },
