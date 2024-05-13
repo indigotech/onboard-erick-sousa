@@ -6,6 +6,10 @@ import gql from 'graphql-tag'
 import { print } from 'graphql/language/printer'
 import bcrypt from 'bcrypt'
 import jwt, { JwtPayload } from 'jsonwebtoken'
+import {
+  shortExpirationTime,
+  longExpirationTime,
+} from '../src/graphql/resolvers'
 
 describe('login mutation tests', function () {
   afterEach(async function () {
@@ -26,7 +30,7 @@ describe('login mutation tests', function () {
     }
   `
 
-  it('Should return a user and a  7 day token as response', async function () {
+  it('Should return a user and a long expiration token as response', async function () {
     const toBeCreatedUser = {
       data: {
         name: 'login_test',
@@ -79,11 +83,11 @@ describe('login mutation tests', function () {
     })
 
     expect((decode as JwtPayload).exp - (decode as JwtPayload).iat).to.be.equal(
-      60 * 60 * 24 * 7
+      longExpirationTime
     )
   })
 
-  it('Should return a user and a  1 minute token as response', async function () {
+  it('Should return a user and a short expiration token as response', async function () {
     const toBeCreatedUser = {
       data: {
         name: 'login_test',
@@ -136,7 +140,7 @@ describe('login mutation tests', function () {
     })
 
     expect((decode as JwtPayload).exp - (decode as JwtPayload).iat).to.be.equal(
-      60
+      shortExpirationTime
     )
   })
 

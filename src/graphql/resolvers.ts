@@ -5,6 +5,9 @@ import bcrypt from 'bcrypt'
 import { User } from '@prisma/client'
 import jwt from 'jsonwebtoken'
 
+export const shortExpirationTime = 1000 * 60 * 60 * 12 // 12 hours
+export const longExpirationTime = 1000 * 60 * 60 * 24 * 7 // 7 days
+
 export const resolvers = {
   Query: {
     hello: () => texts,
@@ -108,7 +111,9 @@ export const resolvers = {
             email: userInfo.email,
           }
 
-          const expirationTime: string = loginInput.rememberMe ? '7d' : '1m'
+          const expirationTime: number = loginInput.rememberMe
+            ? longExpirationTime
+            : shortExpirationTime
 
           const signingKey = process.env.SIGNING_KEY
           const token = jwt.sign(payload, signingKey, {
