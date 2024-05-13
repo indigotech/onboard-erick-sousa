@@ -132,13 +132,6 @@ export const resolvers = {
             error.extensions.code
           )
         }
-        const token = ''
-        const loginResponse = {
-          user: userInfo,
-          token: token,
-        }
-
-        return loginResponse
       }
     },
   },
