@@ -128,8 +128,9 @@ export const resolvers = {
           return loginResponse
         } catch (error) {
           throw new CustomError(
-            'Could not login: ' + error.message,
-            error.extensions.code
+            'Não foi possível realizar o login',
+            500,
+            `jwt sign message: ${error.message}`
           )
         }
       }
