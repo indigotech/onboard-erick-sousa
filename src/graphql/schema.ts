@@ -36,6 +36,7 @@ export const typeDefs = `#graphql
       email: String!
       password: String!
       birthDate: String 
+      token: String
     }
   `
 
