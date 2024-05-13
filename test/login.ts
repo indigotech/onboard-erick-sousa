@@ -5,8 +5,9 @@ import { expect } from 'chai'
 import gql from 'graphql-tag'
 import { print } from 'graphql/language/printer'
 import bcrypt from 'bcrypt'
+import jwt, { JwtPayload } from 'jsonwebtoken'
 
-describe('hello query tests', function () {
+describe('login mutation tests', function () {
   afterEach(async function () {
     await prisma.user.deleteMany({})
   })
@@ -25,8 +26,8 @@ describe('hello query tests', function () {
     }
   `
 
-  it('Should return a user and a token as response', async function () {
-    const createdUser = {
+  it('Should return a user and a  7 day token as response', async function () {
+    const toBeCreatedUser = {
       data: {
         name: 'login_test',
         email: 'login_test',
@@ -36,20 +37,21 @@ describe('hello query tests', function () {
     }
 
     const salt = await bcrypt.genSalt(10)
-    const passwordHash = await bcrypt.hash(createdUser.data.password, salt)
+    const passwordHash = await bcrypt.hash(toBeCreatedUser.data.password, salt)
 
     const createUserResponse = await prisma.user.create({
       data: {
-        name: createdUser.data.name,
-        email: createdUser.data.email,
+        name: toBeCreatedUser.data.name,
+        email: toBeCreatedUser.data.email,
         password: passwordHash,
-        birthDate: createdUser.data.birthDate,
+        birthDate: toBeCreatedUser.data.birthDate,
       },
     })
 
     const loginInfo = {
-      email: createdUser.data.email,
-      password: createdUser.data.password,
+      email: toBeCreatedUser.data.email,
+      password: toBeCreatedUser.data.password,
+      rememberMe: true,
     }
 
     const loginResponse = await axios.post('http://localhost:4000', {
@@ -59,15 +61,83 @@ describe('hello query tests', function () {
       },
     })
 
-    expect(loginResponse.data.data.login).to.deep.eq({
-      user: {
-        id: String(createUserResponse.id),
-        name: createUserResponse.name,
-        email: createUserResponse.email,
-        birthDate: createUserResponse.birthDate,
-      },
-      token: '',
+    const decode = jwt.verify(
+      loginResponse.data.data.login.token,
+      process.env.SIGNING_KEY
+    )
+
+    expect(loginResponse.data.data.login.user).to.deep.eq({
+      id: String(createUserResponse.id),
+      name: createUserResponse.name,
+      email: createUserResponse.email,
+      birthDate: createUserResponse.birthDate,
     })
+
+    expect(decode).to.deep.include({
+      id: createUserResponse.id,
+      email: createUserResponse.email,
+    })
+
+    expect((decode as JwtPayload).exp - (decode as JwtPayload).iat).to.be.equal(
+      60 * 60 * 24 * 7
+    )
+  })
+
+  it('Should return a user and a  1 minute token as response', async function () {
+    const toBeCreatedUser = {
+      data: {
+        name: 'login_test',
+        email: 'login_test',
+        password: 'login_test_1',
+        birthDate: '01-01-1900',
+      },
+    }
+
+    const salt = await bcrypt.genSalt(10)
+    const passwordHash = await bcrypt.hash(toBeCreatedUser.data.password, salt)
+
+    const createUserResponse = await prisma.user.create({
+      data: {
+        name: toBeCreatedUser.data.name,
+        email: toBeCreatedUser.data.email,
+        password: passwordHash,
+        birthDate: toBeCreatedUser.data.birthDate,
+      },
+    })
+
+    const loginInfo = {
+      email: toBeCreatedUser.data.email,
+      password: toBeCreatedUser.data.password,
+      rememberMe: false,
+    }
+
+    const loginResponse = await axios.post('http://localhost:4000', {
+      query: print(loginMutation),
+      variables: {
+        data: loginInfo,
+      },
+    })
+
+    const decode = jwt.verify(
+      loginResponse.data.data.login.token,
+      process.env.SIGNING_KEY
+    )
+
+    expect(loginResponse.data.data.login.user).to.deep.eq({
+      id: String(createUserResponse.id),
+      name: createUserResponse.name,
+      email: createUserResponse.email,
+      birthDate: createUserResponse.birthDate,
+    })
+
+    expect(decode).to.deep.include({
+      id: createUserResponse.id,
+      email: createUserResponse.email,
+    })
+
+    expect((decode as JwtPayload).exp - (decode as JwtPayload).iat).to.be.equal(
+      60
+    )
   })
 
   it('Should fail due to nonexistent user', async function () {
