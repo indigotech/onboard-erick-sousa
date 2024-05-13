@@ -16,7 +16,7 @@ export const resolvers = {
     createUser: async (_, args, contextValue) => {
       const token = contextValue.token
       if (!token || !isTokenValid(token)) {
-        throw new Error('Usuário não autenticado')
+        throw new CustomError('Usuário não autenticado', 400)
       }
       const userInput = args.data
 
