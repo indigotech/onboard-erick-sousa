@@ -148,22 +148,9 @@ function isPasswordValid(password: string): boolean {
   )
 }
 
-async function checkPasswordMatch(passwordInput: string, userPassword: string) {
-  const passwordMatches: boolean = await bcrypt.compare(
-    passwordInput,
-    userPassword
-  )
-  return passwordMatches
-}
-
-function isTokenValid(tokenInput: string): boolean {
-  try {
-    const signingKey = process.env.SIGNING_KEY
-    jwt.verify(tokenInput, signingKey)
-    return true
-  } catch (error) {
-    return false
-  }
+function isTokenValid(tokenInput: string) {
+  const tokenVerification = jwt.verify(tokenInput, process.env.SIGNING_KEY)
+  return !!tokenVerification
 }
 
 async function checkEmailAvailability(email_input: string) {
