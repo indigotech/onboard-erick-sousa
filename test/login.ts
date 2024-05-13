@@ -34,7 +34,7 @@ describe('login mutation tests', function () {
     const toBeCreatedUser = {
       data: {
         name: 'login_test',
-        email: 'login_test',
+        email: 'login_test@gmail.com',
         password: 'login_test_1',
         birthDate: '01-01-1900',
       },
@@ -91,7 +91,7 @@ describe('login mutation tests', function () {
     const toBeCreatedUser = {
       data: {
         name: 'login_test',
-        email: 'login_test',
+        email: 'login_test@gmail.com',
         password: 'login_test_1',
         birthDate: '01-01-1900',
       },
