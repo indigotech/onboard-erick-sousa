@@ -169,6 +169,7 @@ describe('login mutation tests', function () {
     const loginInfo = {
       email: 'wrong_email@gmail.com',
       password: createdUser.data.password,
+      rememberMe: false,
     }
 
     const loginResponse = await axios.post('http://localhost:4000', {
@@ -209,6 +210,7 @@ describe('login mutation tests', function () {
     const loginInfo = {
       email: createdUser.data.email,
       password: 'wrong_password',
+      rememberMe: false,
     }
 
     const loginResponse = await axios.post('http://localhost:4000', {
