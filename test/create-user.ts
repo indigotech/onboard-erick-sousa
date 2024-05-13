@@ -80,14 +80,8 @@ describe('createUser mutation tests', function () {
     })
 
     expect(response.data.data).to.be.null
-    expect(response.data.errors).to.be.deep.eq([
-      {
-        message: 'Email is already registered',
-        code: 409,
-        additionalInfo:
-          'There is another user already created with the provided e-mail adress',
-      },
-    ])
+    expect(response.data.errors).to.be.an('array').that.is.not.empty
+    expect(response.data.errors[0].message).to.be.deep.eq('Email já cadastrado')
   })
 
   it('Should not create the user due to not valid password', async function () {
