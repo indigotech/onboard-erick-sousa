@@ -21,6 +21,7 @@ export const typeDefs = `#graphql
     input LoginInput {
       email: String!
       password: String!
+      rememberMe: Boolean!
     }
 
     type User {
@@ -35,6 +36,7 @@ export const typeDefs = `#graphql
       email: String!
       password: String!
       birthDate: String 
+      token: String
     }
   `
 

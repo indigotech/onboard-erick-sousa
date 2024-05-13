@@ -3,6 +3,7 @@ import { texts } from './schema.js'
 import { CustomError } from './error-handler.js'
 import bcrypt from 'bcrypt'
 import { User } from '@prisma/client'
+import jwt from 'jsonwebtoken'
 
 export const resolvers = {
   Query: {
@@ -94,11 +95,37 @@ export const resolvers = {
       if (!passwordMatches) {
         throw new CustomError('Senha inválida', 401)
       } else {
-        const userInfo = {
-          id: searchedUser.id,
-          name: searchedUser.name,
-          email: searchedUser.email,
-          birthDate: searchedUser.birthDate,
+        try {
+          const userInfo = {
+            id: searchedUser.id,
+            name: searchedUser.name,
+            email: searchedUser.email,
+            birthDate: searchedUser.birthDate,
+          }
+
+          const payload = {
+            id: userInfo.id,
+            email: userInfo.email,
+          }
+
+          const expirationTime: string = loginInput.rememberMe ? '7d' : '1m'
+
+          const signingKey = process.env.SIGNING_KEY
+          const token = jwt.sign(payload, signingKey, {
+            expiresIn: expirationTime,
+          })
+
+          const loginResponse = {
+            user: userInfo,
+            token: token,
+          }
+
+          return loginResponse
+        } catch (error) {
+          throw new CustomError(
+            'Could not login: ' + error.message,
+            error.extensions.code
+          )
         }
         const token = ''
         const loginResponse = {
