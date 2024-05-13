@@ -10,6 +10,30 @@ export const longExpirationTime = 1000 * 60 * 60 * 24 * 7 // 7 days
 export const resolvers = {
   Query: {
     hello: () => texts,
+    user: async (_, args, contextValue) => {
+      const token = contextValue.token
+      if (!token || !isTokenValid(token)) {
+        throw new CustomError('Usuário não autenticado', 400)
+      }
+      const idInput = args.data
+      const idExists = await checkIdExistance(idInput)
+
+      if (!idExists) {
+        throw new CustomError(
+          'Usuário não encontrado',
+          400,
+          `There is no user registered with the given id`
+        )
+      }
+
+      const searchedUser = await prisma.user.findUnique({
+        where: {
+          id: parseInt(idInput),
+        },
+      })
+
+      return searchedUser
+    },
   },
   Mutation: {
     createUser: async (_, args, contextValue) => {
@@ -164,6 +188,16 @@ async function checkEmailAvailability(email_input: string) {
   const user = await prisma.user.findUnique({
     where: {
       email: email_input,
+    },
+  })
+
+  return !!user
+}
+
+async function checkIdExistance(idInput) {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: parseInt(idInput),
     },
   })
 
