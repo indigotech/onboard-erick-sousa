@@ -5,6 +5,7 @@ import { expect } from 'chai'
 import gql from 'graphql-tag'
 import { print } from 'graphql/language/printer'
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 
 describe('createUser mutation tests', function () {
   const correctUserInfo = {
@@ -32,12 +33,36 @@ describe('createUser mutation tests', function () {
   })
 
   it('Should create a new user', async function () {
-    const response = await axios.post('http://localhost:4000', {
-      query: print(createUserMutation),
-      variables: {
-        data: correctUserInfo.data,
+    const authenticatedUser = await prisma.user.create({
+      data: {
+        name: 'authenticated',
+        email: 'authenticated@gmail.com',
+        password: 'test_password1',
+        birthDate: '01-01-1900',
       },
     })
+
+    const payload = {
+      id: authenticatedUser.id,
+      email: authenticatedUser.email,
+    }
+
+    const token = jwt.sign(payload, process.env.SIGNING_KEY)
+
+    const response = await axios.post(
+      'http://localhost:4000',
+      {
+        query: print(createUserMutation),
+        variables: {
+          data: correctUserInfo.data,
+        },
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
+      }
+    )
 
     const user = await prisma.user.findUnique({
       where: {
@@ -70,14 +95,39 @@ describe('createUser mutation tests', function () {
   })
 
   it('Should not create the user due to not unique e-mail', async function () {
-    await prisma.user.create(correctUserInfo)
 
-    const response = await axios.post('http://localhost:4000', {
-      query: print(createUserMutation),
-      variables: {
-        data: correctUserInfo.data,
+    const authenticatedUser = await prisma.user.create({
+      data: {
+        name: 'authenticated',
+        email: 'authenticated@gmail.com',
+        password: 'test_password1',
+        birthDate: '01-01-1900',
       },
     })
+
+    const payload = {
+      id: authenticatedUser.id,
+      email: authenticatedUser.email,
+    }
+
+    const token = jwt.sign(payload, process.env.SIGNING_KEY)
+
+    await prisma.user.create(correctUserInfo)
+
+    const response = await axios.post(
+      'http://localhost:4000',
+      {
+        query: print(createUserMutation),
+        variables: {
+          data: correctUserInfo.data,
+        },
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
+      }
+    )
 
     expect(response.data.data).to.be.null
     expect(response.data.errors).to.be.an('array').that.is.not.empty
