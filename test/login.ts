@@ -104,7 +104,12 @@ describe('hello query tests', function () {
       },
     })
 
+    console.log(loginResponse.data.errors[0].message)
+
     expect(loginResponse.data.errors).to.be.an('array').that.is.not.empty
+    expect(loginResponse.data.errors[0].message).to.be.deep.eq(
+      'Usuário não encontrado'
+    )
   })
 
   it('Should fail due to wrong password user', async function () {
@@ -130,7 +135,7 @@ describe('hello query tests', function () {
     })
 
     const loginInfo = {
-      email: createdUser.data.password,
+      email: createdUser.data.email,
       password: 'wrong_password',
     }
 
@@ -142,5 +147,6 @@ describe('hello query tests', function () {
     })
 
     expect(loginResponse.data.errors).to.be.an('array').that.is.not.empty
+    expect(loginResponse.data.errors[0].message).to.be.deep.eq('Senha inválida')
   })
 })

@@ -72,16 +72,18 @@ export const resolvers = {
 
     login: async (_, args) => {
       const loginInput = args.data
-      let searchedUser: User
+      const searchedUser = await prisma.user.findUnique({
+        where: {
+          email: loginInput.email,
+        },
+      })
 
-      try {
-        searchedUser = await prisma.user.findUnique({
-          where: {
-            email: loginInput.email,
-          },
-        })
-      } catch (error) {
-        throw new CustomError('Usuário não encontrado', 400, `There is no user registered with the given email adress`)
+      if (!searchedUser) {
+        throw new CustomError(
+          'Usuário não encontrado',
+          400,
+          `There is no user registered with the given email adress`
+        )
       }
 
       const passwordMatches = await checkPasswordMatch(
