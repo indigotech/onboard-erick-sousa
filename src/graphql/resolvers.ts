@@ -13,7 +13,11 @@ export const resolvers = {
     hello: () => texts,
   },
   Mutation: {
-    createUser: async (_, args) => {
+    createUser: async (_, args, contextValue) => {
+      const token = contextValue.token
+      if (!token || !isTokenValid(token)) {
+        throw new Error('Usuário não autenticado')
+      }
       const userInput = args.data
 
       if (!isPasswordValid(userInput.password)) {
@@ -150,6 +154,16 @@ async function checkPasswordMatch(passwordInput: string, userPassword: string) {
     userPassword
   )
   return passwordMatches
+}
+
+function isTokenValid(tokenInput: string): boolean {
+  try {
+    const signingKey = process.env.SIGNING_KEY
+    jwt.verify(tokenInput, signingKey)
+    return true
+  } catch (error) {
+    return false
+  }
 }
 
 async function checkEmailAvailability(email_input: string) {
