@@ -104,8 +104,6 @@ describe('hello query tests', function () {
       },
     })
 
-    console.log(loginResponse.data.errors[0].message)
-
     expect(loginResponse.data.errors).to.be.an('array').that.is.not.empty
     expect(loginResponse.data.errors[0].message).to.be.deep.eq(
       'Usuário não encontrado'
