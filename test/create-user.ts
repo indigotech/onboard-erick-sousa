@@ -33,18 +33,9 @@ describe('createUser mutation tests', function () {
   })
 
   it('Should create a new user', async function () {
-    const authenticatedUser = await prisma.user.create({
-      data: {
-        name: 'authenticated',
-        email: 'authenticated@gmail.com',
-        password: 'test_password1',
-        birthDate: '01-01-1900',
-      },
-    })
-
     const payload = {
-      id: authenticatedUser.id,
-      email: authenticatedUser.email,
+      id: 10000,
+      email: 'payload_email@gmail.com',
     }
 
     const token = jwt.sign(payload, process.env.SIGNING_KEY)
@@ -95,19 +86,9 @@ describe('createUser mutation tests', function () {
   })
 
   it('Should not create the user due to not unique e-mail', async function () {
-
-    const authenticatedUser = await prisma.user.create({
-      data: {
-        name: 'authenticated',
-        email: 'authenticated@gmail.com',
-        password: 'test_password1',
-        birthDate: '01-01-1900',
-      },
-    })
-
     const payload = {
-      id: authenticatedUser.id,
-      email: authenticatedUser.email,
+      id: 10000,
+      email: 'payload_email@gmail.com',
     }
 
     const token = jwt.sign(payload, process.env.SIGNING_KEY)
