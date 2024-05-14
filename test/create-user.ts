@@ -39,6 +39,7 @@ describe('createUser mutation tests', function () {
     }
 
     const token = jwt.sign(payload, process.env.SIGNING_KEY)
+    console.log(token)
 
     const response = await axios.post(
       'http://localhost:4000',

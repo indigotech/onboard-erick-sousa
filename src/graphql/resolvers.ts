@@ -28,6 +28,23 @@ export const resolvers = {
 
       return user
     },
+    users: async (_, args, contextValue) => {
+      const token = contextValue.token
+      if (!token || !isTokenValid(token)) {
+        throw new CustomError('Usuário não autenticado', 400)
+      }
+
+      const userLimit = args.userLimit || 50
+
+      const users = await prisma.user.findMany({
+        orderBy: {
+          name: 'asc',
+        },
+        take: userLimit,
+      })
+
+      return users
+    },
   },
   Mutation: {
     createUser: async (_, args, contextValue) => {
