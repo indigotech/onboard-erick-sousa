@@ -2,11 +2,11 @@ import { faker } from '@faker-js/faker'
 import setup from '../setup.js'
 import { prisma } from '../setup-db.js'
 import { stopServer } from '../setup-server.js'
-import bcrypt from 'bcrypt' 
+import bcrypt from 'bcrypt'
 
 await setup()
 
-const users = await generateUniqueUsers(50)
+const users = await generateUniqueUsers(75)
 
 users.forEach((user, index) => {
   console.log(`User ${index + 1}:`)
