@@ -6,16 +6,7 @@ import bcrypt from 'bcrypt'
 
 await setup()
 
-const users = await generateUniqueUsers(75)
-
-users.forEach((user, index) => {
-  console.log(`User ${index + 1}:`)
-  console.log(`Name: ${user.name}`)
-  console.log(`Email: ${user.email}`)
-  console.log(`Birth Date: ${user.birthDate}`)
-  console.log(`Password: ${user.password}`)
-  console.log('---------------------')
-})
+await generateUniqueUsers(75)
 
 await stopServer()
 
