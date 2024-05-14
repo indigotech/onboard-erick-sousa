@@ -13,6 +13,10 @@ const server = new ApolloServer({
 export async function startServer() {
   const { url } = await startStandaloneServer(server, {
     listen: { port: 4000 },
+    context: async ({ req }) => {
+      const token = req.headers.authorization
+      return { token }
+    },
   })
 
   console.log(`🚀  Access server at: ${url}`)

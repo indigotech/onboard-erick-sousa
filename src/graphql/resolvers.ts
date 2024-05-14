@@ -2,7 +2,6 @@ import { prisma } from '../setup-db.js'
 import { texts } from './schema.js'
 import { CustomError } from './error-handler.js'
 import bcrypt from 'bcrypt'
-import { User } from '@prisma/client'
 import jwt from 'jsonwebtoken'
 
 export const shortExpirationTime = 1000 * 60 * 60 * 12 // 12 hours
@@ -13,7 +12,11 @@ export const resolvers = {
     hello: () => texts,
   },
   Mutation: {
-    createUser: async (_, args) => {
+    createUser: async (_, args, contextValue) => {
+      const token = contextValue.token
+      if (!token || !isTokenValid(token)) {
+        throw new CustomError('Usuário não autenticado', 400)
+      }
       const userInput = args.data
 
       if (!isPasswordValid(userInput.password)) {
@@ -150,6 +153,11 @@ async function checkPasswordMatch(passwordInput: string, userPassword: string) {
     userPassword
   )
   return passwordMatches
+}
+
+function isTokenValid(tokenInput: string) {
+  const tokenVerification = jwt.verify(tokenInput, process.env.SIGNING_KEY)
+  return !!tokenVerification
 }
 
 async function checkEmailAvailability(email_input: string) {
