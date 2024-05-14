@@ -10,7 +10,7 @@ describe('createUser mutation tests', function () {
   const correctUserInfo = {
     data: {
       name: 'test_name',
-      email: 'test_emai1',
+      email: 'test_emai1@gmail.com',
       password: 'test_password1',
       birthDate: '01-01-1900',
     },
@@ -88,7 +88,7 @@ describe('createUser mutation tests', function () {
     const wrongUserPasswordInfo = {
       data: {
         name: 'test_name',
-        email: 'test_email2',
+        email: 'test_email2@gmail.com',
         password: 'test_password',
         birthDate: '01-01-1900',
       },

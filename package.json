@@ -8,7 +8,7 @@
     "compile": "tsc",
     "startDev": "dotenv -e .env -- npm run compile && node ./dist/src/index.js",
     "startTest": "dotenv -e test.env -- npm run compile && node ./dist/src/index.js",
-    "test": "dotenv -e test.env -- mocha --require ts-node/register ./test/*.ts",
+    "test": "dotenv -e test.env -- mocha --require ts-node/register ./test/index.ts",
     "studioDev": "dotenv -e .env -- npx prisma studio",
     "studioTest": "dotenv -e test.env -- npx prisma studio",
     "migrateDev": "dotenv -e .env -- npx prisma migrate deploy",
@@ -28,6 +28,7 @@
     "@apollo/server": "4.10.4",
     "@prisma/client": "5.13.0",
     "@types/chai": "4.3.16",
+    "@types/jsonwebtoken": "9.0.6",
     "axios": "1.6.8",
     "bcrypt": "5.1.1",
     "chai": "5.1.0",
@@ -37,6 +38,7 @@
     "graphql": "16.8.1",
     "graphql-http": "1.22.1",
     "graphql-tag": "2.12.6",
+    "jsonwebtoken": "9.0.2",
     "ruru": "2.0.0-beta.11"
   },
   "devDependencies": {

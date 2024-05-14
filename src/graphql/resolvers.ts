@@ -3,6 +3,10 @@ import { texts } from './schema.js'
 import { CustomError } from './error-handler.js'
 import bcrypt from 'bcrypt'
 import { User } from '@prisma/client'
+import jwt from 'jsonwebtoken'
+
+export const shortExpirationTime = 1000 * 60 * 60 * 12 // 12 hours
+export const longExpirationTime = 1000 * 60 * 60 * 24 * 7 // 7 days
 
 export const resolvers = {
   Query: {
@@ -94,19 +98,41 @@ export const resolvers = {
       if (!passwordMatches) {
         throw new CustomError('Senha inválida', 401)
       } else {
-        const userInfo = {
-          id: searchedUser.id,
-          name: searchedUser.name,
-          email: searchedUser.email,
-          birthDate: searchedUser.birthDate,
-        }
-        const token = ''
-        const loginResponse = {
-          user: userInfo,
-          token: token,
-        }
+        try {
+          const userInfo = {
+            id: searchedUser.id,
+            name: searchedUser.name,
+            email: searchedUser.email,
+            birthDate: searchedUser.birthDate,
+          }
 
-        return loginResponse
+          const payload = {
+            id: userInfo.id,
+            email: userInfo.email,
+          }
+
+          const expirationTime: number = loginInput.rememberMe
+            ? longExpirationTime
+            : shortExpirationTime
+
+          const signingKey = process.env.SIGNING_KEY
+          const token = jwt.sign(payload, signingKey, {
+            expiresIn: expirationTime,
+          })
+
+          const loginResponse = {
+            user: userInfo,
+            token: token,
+          }
+
+          return loginResponse
+        } catch (error) {
+          throw new CustomError(
+            'Não foi possível realizar o login',
+            500,
+            `jwt sign message: ${error.message}`
+          )
+        }
       }
     },
   },
