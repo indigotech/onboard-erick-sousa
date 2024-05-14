@@ -40,7 +40,7 @@ describe('user query mutation tests', function () {
     await prisma.user.deleteMany({})
   })
 
-  it('Should return the authenticated user', async function () {
+  it('Should return the authenticated user himself', async function () {
     const authenticatedUser = await prisma.user.create(authenticatedUserInfo)
 
     const payload = {
@@ -55,7 +55,7 @@ describe('user query mutation tests', function () {
       {
         query: print(userQuery),
         variables: {
-          id: authenticatedUser.id,
+          id: payload.id,
         },
       },
       {
@@ -64,7 +64,6 @@ describe('user query mutation tests', function () {
         },
       }
     )
-
 
     const expectedResponse = {
       id: String(authenticatedUser.id),
@@ -114,14 +113,11 @@ describe('user query mutation tests', function () {
   })
 
   it('Should fail due to wrong id input', async function () {
-    const authenticatedUser = await prisma.user.create(authenticatedUserInfo)
-
-    const wrongId = authenticatedUser.id + 1
-
     const payload = {
-      id: authenticatedUser.id,
-      email: authenticatedUser.email,
+      id: 10000,
+      email: 'payload_email@gmail.com',
     }
+    const wrongId = payload.id + 1
 
     const token = jwt.sign(payload, process.env.SIGNING_KEY)
 
@@ -147,16 +143,13 @@ describe('user query mutation tests', function () {
   it('Should fail due to invalid token', async function () {
     const invalidToken =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
-    const authenticatedUser = await prisma.user.create(authenticatedUserInfo)
-
-    const wrongId = authenticatedUser.id + 1
 
     const response = await axios.post(
       'http://localhost:4000',
       {
         query: print(userQuery),
         variables: {
-          id: wrongId,
+          id: 1,
         },
       },
       {
@@ -171,19 +164,15 @@ describe('user query mutation tests', function () {
   })
 
   it('Should fail due to lack of authentication', async function () {
-    const notAuthenticatedUser = await prisma.user.create({
-      data: {
-        name: 'authenticated',
-        email: 'authenticated@gmail.com',
-        password: 'test_password1',
-        birthDate: '01-01-1900',
-      },
-    })
+    const payload = {
+      id: 10000,
+      email: 'payload_email@gmail.com',
+    }
 
     const response = await axios.post('http://localhost:4000', {
       query: print(userQuery),
       variables: {
-        id: notAuthenticatedUser.id,
+        id: payload.id,
       },
     })
 
