@@ -3,6 +3,7 @@ import setup from '../setup.js'
 import { prisma } from '../setup-db.js'
 import { stopServer } from '../setup-server.js'
 import bcrypt from 'bcrypt'
+import { CustomError } from '../graphql/error-handler.js'
 
 await setup()
 
@@ -36,10 +37,14 @@ async function generateUniqueUsers(count: number) {
     users.push(user)
   }
 
-  await prisma.user.createMany({
+  const createdUsers = await prisma.user.createMany({
     data: users,
     skipDuplicates: true,
   })
+
+  if (!createdUsers) {
+    throw new CustomError('Ocorreu um erro na criação dos usuários', 500)
+  }
 
   return users
 }
