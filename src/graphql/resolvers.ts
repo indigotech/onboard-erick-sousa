@@ -16,9 +16,9 @@ export const resolvers = {
         throw new CustomError('Usuário não autenticado', 400)
       }
       const idInput = args.id
-      const idExists = await checkIdExistance(idInput)
+      const user = await checkIdExistance(idInput)
 
-      if (!idExists) {
+      if (!user) {
         throw new CustomError(
           'Usuário não encontrado',
           400,
@@ -26,13 +26,7 @@ export const resolvers = {
         )
       }
 
-      const searchedUser = await prisma.user.findUnique({
-        where: {
-          id: parseInt(idInput),
-        },
-      })
-
-      return searchedUser
+      return user
     },
   },
   Mutation: {
@@ -201,5 +195,5 @@ async function checkIdExistance(idInput) {
     },
   })
 
-  return !!user
+  return user
 }
