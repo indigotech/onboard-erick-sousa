@@ -14,3 +14,4 @@ after(async function () {
 import './hello-query'
 import './create-user'
 import './login'
+import './user-query'
