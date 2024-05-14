@@ -2,7 +2,6 @@ import { prisma } from '../setup-db.js'
 import { texts } from './schema.js'
 import { CustomError } from './error-handler.js'
 import bcrypt from 'bcrypt'
-import { User } from '@prisma/client'
 import jwt from 'jsonwebtoken'
 
 export const shortExpirationTime = 1000 * 60 * 60 * 12 // 12 hours
@@ -146,6 +145,14 @@ function isPasswordValid(password: string): boolean {
   return (
     password.length >= 6 && /[0-9]/.test(password) && /[a-zA-Z]/.test(password)
   )
+}
+
+async function checkPasswordMatch(passwordInput: string, userPassword: string) {
+  const passwordMatches: boolean = await bcrypt.compare(
+    passwordInput,
+    userPassword
+  )
+  return passwordMatches
 }
 
 function isTokenValid(tokenInput: string) {

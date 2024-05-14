@@ -155,14 +155,14 @@ describe('login mutation tests', function () {
     }
 
     const salt = await bcrypt.genSalt(10)
-    const passwordHash = await bcrypt.hash(toBeCreatedUser.data.password, salt)
+    const passwordHash = await bcrypt.hash(createdUser.data.password, salt)
 
     await prisma.user.create({
       data: {
-        name: toBeCreatedUser.data.name,
-        email: toBeCreatedUser.data.email,
+        name: createdUser.data.name,
+        email: createdUser.data.email,
         password: passwordHash,
-        birthDate: toBeCreatedUser.data.birthDate,
+        birthDate: createdUser.data.birthDate,
       },
     })
 
