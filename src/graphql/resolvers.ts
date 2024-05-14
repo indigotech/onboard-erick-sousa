@@ -15,7 +15,7 @@ export const resolvers = {
       if (!token || !isTokenValid(token)) {
         throw new CustomError('Usuário não autenticado', 400)
       }
-      const idInput = args.data
+      const idInput = args.id
       const idExists = await checkIdExistance(idInput)
 
       if (!idExists) {

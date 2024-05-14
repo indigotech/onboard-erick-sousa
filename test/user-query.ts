@@ -26,8 +26,8 @@ describe('user query mutation tests', function () {
   }
 
   const userQuery = gql`
-    query user($data: ID!) {
-      user(data: $data) {
+    query user($id: ID!) {
+      user(id: $id) {
         id
         name
         email
@@ -55,7 +55,7 @@ describe('user query mutation tests', function () {
       {
         query: print(userQuery),
         variables: {
-          data: authenticatedUser.id,
+          id: authenticatedUser.id,
         },
       },
       {
@@ -64,6 +64,7 @@ describe('user query mutation tests', function () {
         },
       }
     )
+
 
     const expectedResponse = {
       id: String(authenticatedUser.id),
@@ -92,7 +93,7 @@ describe('user query mutation tests', function () {
       {
         query: print(userQuery),
         variables: {
-          data: searchedUser.id,
+          id: searchedUser.id,
         },
       },
       {
@@ -129,7 +130,7 @@ describe('user query mutation tests', function () {
       {
         query: print(userQuery),
         variables: {
-          data: wrongId,
+          id: wrongId,
         },
       },
       {
@@ -155,7 +156,7 @@ describe('user query mutation tests', function () {
       {
         query: print(userQuery),
         variables: {
-          data: wrongId,
+          id: wrongId,
         },
       },
       {
@@ -182,7 +183,7 @@ describe('user query mutation tests', function () {
     const response = await axios.post('http://localhost:4000', {
       query: print(userQuery),
       variables: {
-        data: notAuthenticatedUser.id,
+        id: notAuthenticatedUser.id,
       },
     })
 
