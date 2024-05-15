@@ -34,16 +34,38 @@ export const resolvers = {
         throw new CustomError('Usuário não autenticado', 400)
       }
 
-      const userLimit = args.userLimit || 50
+      const userLimit = args.data.userLimit || 50
+      const skippedUsers = args.data.skippedUsers || 0
+
+      const allUsers = await prisma.user.findMany()
+      const totalUsers = allUsers.length
 
       const users = await prisma.user.findMany({
         orderBy: {
           name: 'asc',
         },
+        skip: skippedUsers,
         take: userLimit,
       })
 
-      return users
+      const usersBefore: boolean = skippedUsers != 0
+      const usersAfter: boolean = skippedUsers + userLimit < totalUsers
+
+      const usersResponse = {
+        userList: users,
+        totalResults: totalUsers,
+        usersBefore: usersBefore,
+        usersAfter: usersAfter,
+      }
+
+      console.log(`userLimit: ${userLimit}`)
+      console.log(`skippedUsers: ${skippedUsers}`)
+      console.log(`totalUsers: ${totalUsers}`)
+      console.log(`usersBefore: ${usersBefore}`)
+      console.log(`usersAfter: ${usersAfter}`)
+      console.log(`users.lenght: ${users.length}`)
+
+      return usersResponse
     },
   },
   Mutation: {
