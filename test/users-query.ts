@@ -365,6 +365,46 @@ describe('Multiple users query mutation tests', function () {
       .to.be.deep.eq(expectedResponse)
   })
 
+  it('Should return an empty page', async function () {
+    await prisma.user.createMany(reversedList)
+
+    const expectedResponse = {
+      userList: [],
+      totalResults: 10,
+      hasUsersBefore: true,
+      hasUsersAfter: false,
+    }
+
+    const payload = {
+      id: 10000,
+      email: 'payload_email@gmail.com',
+    }
+
+    const token = jwt.sign(payload, process.env.SIGNING_KEY)
+
+    const response = await axios.post(
+      'http://localhost:4000',
+      {
+        query: print(usersQuery),
+        variables: {
+          data: {
+            usersPerPage: 3,
+            skippedUsers: 10,
+          },
+        },
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
+      }
+    )
+
+    expect(response.data.data.users)
+      .excludingEvery('id')
+      .to.be.deep.eq(expectedResponse)
+  })
+
   it('Should fail due to negative skip', async function () {
     await prisma.user.createMany(reversedList)
 
