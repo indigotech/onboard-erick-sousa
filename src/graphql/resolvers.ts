@@ -34,36 +34,36 @@ export const resolvers = {
         throw new CustomError('Usuário não autenticado', 400)
       }
 
-      const userLimit = args.data.userLimit || 50
+      const usersPerPage = args.data.usersPerPage || 10
       const skippedUsers = args.data.skippedUsers || 0
 
-      const allUsers = await prisma.user.findMany()
-      const totalUsers = allUsers.length
+      if (usersPerPage < 0 || skippedUsers < 0) {
+        throw new CustomError(
+          'Solicitação inválida',
+          400,
+          'There must be at least one user per page and you cant skip a negative number (there is no backwards pagination)'
+        )
+      }
+
+      const totalUsers = await prisma.user.count()
 
       const users = await prisma.user.findMany({
         orderBy: {
           name: 'asc',
         },
         skip: skippedUsers,
-        take: userLimit,
+        take: usersPerPage,
       })
 
-      const usersBefore: boolean = skippedUsers != 0
-      const usersAfter: boolean = skippedUsers + userLimit < totalUsers
+      const hasUsersBefore: boolean = skippedUsers != 0
+      const hasUsersAfter: boolean = skippedUsers + usersPerPage < totalUsers
 
       const usersResponse = {
         userList: users,
         totalResults: totalUsers,
-        usersBefore: usersBefore,
-        usersAfter: usersAfter,
+        hasUsersBefore: hasUsersBefore,
+        hasUsersAfter: hasUsersAfter,
       }
-
-      console.log(`userLimit: ${userLimit}`)
-      console.log(`skippedUsers: ${skippedUsers}`)
-      console.log(`totalUsers: ${totalUsers}`)
-      console.log(`usersBefore: ${usersBefore}`)
-      console.log(`usersAfter: ${usersAfter}`)
-      console.log(`users.lenght: ${users.length}`)
 
       return usersResponse
     },
