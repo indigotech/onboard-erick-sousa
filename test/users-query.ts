@@ -3,11 +3,15 @@ import { prisma } from '../src/setup-db'
 import { describe, it } from 'mocha'
 import gql from 'graphql-tag'
 import { print } from 'graphql/language/printer'
-import { expect } from 'chai'
+import { expect, use } from 'chai'
+import chaiExclude from 'chai-exclude'
 import jwt from 'jsonwebtoken'
 import { faker } from '@faker-js/faker'
 
 describe('Multiple users query mutation tests', function () {
+
+  use(chaiExclude)
+
   const userList = {
     data: [
       {
@@ -83,8 +87,8 @@ describe('Multiple users query mutation tests', function () {
     ],
   }
 
-  const shuffledList = {
-    data: faker.helpers.shuffle(userList.data),
+  const reversedList = {
+    data: [...userList.data].reverse(),
   }
 
   const usersQuery = gql`
@@ -108,7 +112,7 @@ describe('Multiple users query mutation tests', function () {
   })
 
   it('Should fail due to lack of authentication', async function () {
-    await prisma.user.createMany(shuffledList)
+    await prisma.user.createMany(reversedList)
 
     const response = await axios.post('http://localhost:4000', {
       query: print(usersQuery),
@@ -125,25 +129,15 @@ describe('Multiple users query mutation tests', function () {
   })
 
   it('Should return all users on alphabetical order', async function () {
-    await prisma.user.createMany(shuffledList)
+    await prisma.user.createMany(reversedList)
 
-    const createdUsers = await prisma.user.findMany({
-      orderBy: {
-        name: 'asc',
-      },
-      skip: 0,
-      take: 10,
+    const userListWithoutPasswords = userList.data.map((user) => {
+      const { password, ...userWithoutPassword } = user
+      return userWithoutPassword
     })
 
     const expectedResponse = {
-      userList: createdUsers.map((user) => {
-        return {
-          id: String(user.id),
-          name: user.name,
-          email: user.email,
-          birthDate: user.birthDate,
-        }
-      }),
+      userList: userListWithoutPasswords,
       totalResults: 10,
       hasUsersBefore: false,
       hasUsersAfter: false,
@@ -174,29 +168,25 @@ describe('Multiple users query mutation tests', function () {
       }
     )
 
-    expect(response.data.data.users).to.be.deep.eq(expectedResponse)
+    expect(response.data.data.users)
+      .excludingEvery('id')
+      .to.be.deep.eq(expectedResponse)
   })
 
   it('Should return the first page (users 1-3 from 10 users)', async function () {
-    await prisma.user.createMany(shuffledList)
+    await prisma.user.createMany(reversedList)
 
-    const createdUsers = await prisma.user.findMany({
-      orderBy: {
-        name: 'asc',
-      },
-      skip: 0,
-      take: 3,
+    const userListWithoutPasswords = userList.data.map((user) => {
+      const { password, ...userWithoutPassword } = user
+      return userWithoutPassword
     })
 
     const expectedResponse = {
-      userList: createdUsers.map((user) => {
-        return {
-          id: String(user.id),
-          name: user.name,
-          email: user.email,
-          birthDate: user.birthDate,
-        }
-      }),
+      userList: [
+        userListWithoutPasswords[0],
+        userListWithoutPasswords[1],
+        userListWithoutPasswords[2],
+      ],
       totalResults: 10,
       hasUsersBefore: false,
       hasUsersAfter: true,
@@ -227,29 +217,25 @@ describe('Multiple users query mutation tests', function () {
       }
     )
 
-    expect(response.data.data.users).to.be.deep.eq(expectedResponse)
+    expect(response.data.data.users)
+      .excludingEvery('id')
+      .to.be.deep.eq(expectedResponse)
   })
 
   it('Should return the second page (users 4-6 from 10 users)', async function () {
-    await prisma.user.createMany(shuffledList)
+    await prisma.user.createMany(reversedList)
 
-    const createdUsers = await prisma.user.findMany({
-      orderBy: {
-        name: 'asc',
-      },
-      skip: 3,
-      take: 3,
+    const userListWithoutPasswords = userList.data.map((user) => {
+      const { password, ...userWithoutPassword } = user
+      return userWithoutPassword
     })
 
     const expectedResponse = {
-      userList: createdUsers.map((user) => {
-        return {
-          id: String(user.id),
-          name: user.name,
-          email: user.email,
-          birthDate: user.birthDate,
-        }
-      }),
+      userList: [
+        userListWithoutPasswords[3],
+        userListWithoutPasswords[4],
+        userListWithoutPasswords[5],
+      ],
       totalResults: 10,
       hasUsersBefore: true,
       hasUsersAfter: true,
@@ -280,29 +266,25 @@ describe('Multiple users query mutation tests', function () {
       }
     )
 
-    expect(response.data.data.users).to.be.deep.eq(expectedResponse)
+    expect(response.data.data.users)
+      .excludingEvery('id')
+      .to.be.deep.eq(expectedResponse)
   })
 
   it('Should return the third page (users 7-9 from 10 users)', async function () {
-    await prisma.user.createMany(shuffledList)
+    await prisma.user.createMany(reversedList)
 
-    const createdUsers = await prisma.user.findMany({
-      orderBy: {
-        name: 'asc',
-      },
-      skip: 6,
-      take: 3,
+    const userListWithoutPasswords = userList.data.map((user) => {
+      const { password, ...userWithoutPassword } = user
+      return userWithoutPassword
     })
 
     const expectedResponse = {
-      userList: createdUsers.map((user) => {
-        return {
-          id: String(user.id),
-          name: user.name,
-          email: user.email,
-          birthDate: user.birthDate,
-        }
-      }),
+      userList: [
+        userListWithoutPasswords[6],
+        userListWithoutPasswords[7],
+        userListWithoutPasswords[8],
+      ],
       totalResults: 10,
       hasUsersBefore: true,
       hasUsersAfter: true,
@@ -333,29 +315,21 @@ describe('Multiple users query mutation tests', function () {
       }
     )
 
-    expect(response.data.data.users).to.be.deep.eq(expectedResponse)
+    expect(response.data.data.users)
+      .excludingEvery('id')
+      .to.be.deep.eq(expectedResponse)
   })
 
   it('Should return the fourth page (only 10th user from 10 users)', async function () {
-    await prisma.user.createMany(shuffledList)
+    await prisma.user.createMany(reversedList)
 
-    const createdUsers = await prisma.user.findMany({
-      orderBy: {
-        name: 'asc',
-      },
-      skip: 9,
-      take: 3,
+    const userListWithoutPasswords = userList.data.map((user) => {
+      const { password, ...userWithoutPassword } = user
+      return userWithoutPassword
     })
 
     const expectedResponse = {
-      userList: createdUsers.map((user) => {
-        return {
-          id: String(user.id),
-          name: user.name,
-          email: user.email,
-          birthDate: user.birthDate,
-        }
-      }),
+      userList: [userListWithoutPasswords[9]],
       totalResults: 10,
       hasUsersBefore: true,
       hasUsersAfter: false,
@@ -386,11 +360,13 @@ describe('Multiple users query mutation tests', function () {
       }
     )
 
-    expect(response.data.data.users).to.be.deep.eq(expectedResponse)
+    expect(response.data.data.users)
+      .excludingEvery('id')
+      .to.be.deep.eq(expectedResponse)
   })
 
   it('Should fail due to negative skip', async function () {
-    await prisma.user.createMany(shuffledList)
+    await prisma.user.createMany(reversedList)
 
     const payload = {
       id: 10000,
@@ -422,7 +398,7 @@ describe('Multiple users query mutation tests', function () {
   })
 
   it('Should fail due to less the one users per page request', async function () {
-    await prisma.user.createMany(shuffledList)
+    await prisma.user.createMany(reversedList)
 
     const payload = {
       id: 10000,
