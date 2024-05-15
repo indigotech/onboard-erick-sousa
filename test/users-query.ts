@@ -421,7 +421,7 @@ describe('Multiple users query mutation tests', function () {
     expect(response.data.errors[0].message).to.be.eq('Solicitação inválida')
   })
 
-  it('Should fail due to negative users per page request', async function () {
+  it('Should fail due to less the one users per page request', async function () {
     await prisma.user.createMany(shuffledList)
 
     const payload = {
@@ -437,7 +437,7 @@ describe('Multiple users query mutation tests', function () {
         query: print(usersQuery),
         variables: {
           data: {
-            usersPerPage: -1,
+            usersPerPage: 0,
             skippedUsers: 0,
           },
         },

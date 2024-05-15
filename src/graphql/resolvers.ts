@@ -34,10 +34,10 @@ export const resolvers = {
         throw new CustomError('Usuário não autenticado', 400)
       }
 
-      const usersPerPage = args.data.usersPerPage || 10
-      const skippedUsers = args.data.skippedUsers || 0
+      const usersPerPage = args.data.usersPerPage ?? 10
+      const skippedUsers = args.data.skippedUsers ?? 0
 
-      if (usersPerPage < 0 || skippedUsers < 0) {
+      if (usersPerPage < 1 || skippedUsers < 0) {
         throw new CustomError(
           'Solicitação inválida',
           400,
@@ -55,7 +55,7 @@ export const resolvers = {
         take: usersPerPage,
       })
 
-      const hasUsersBefore: boolean = skippedUsers != 0
+      const hasUsersBefore: boolean = skippedUsers !== 0
       const hasUsersAfter: boolean = skippedUsers + usersPerPage < totalUsers
 
       const usersResponse = {
