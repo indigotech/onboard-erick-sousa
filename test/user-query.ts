@@ -5,7 +5,6 @@ import gql from 'graphql-tag'
 import { print } from 'graphql/language/printer'
 import { expect, use } from 'chai'
 import jwt from 'jsonwebtoken'
-import { create } from 'domain'
 import chaiExclude from 'chai-exclude'
 
 describe('user query mutation tests', function () {
