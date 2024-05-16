@@ -25,7 +25,7 @@ async function setupDatabase(userList, addressList) {
 
   for (let i = 0; i < 10; i++) {
     password = `taki_senha${i}`
-    const salt = await bcrypt.genSalt(10)
+    const salt = await bcrypt.genSalt(2)
     const passwordHash = await bcrypt.hash(password, salt)
 
     userList.data[i] = {
@@ -90,7 +90,6 @@ describe('Multiple users query mutation tests', function () {
           email
           birthDate
           addresses {
-            userId
             cep
             city
             complement
@@ -133,8 +132,17 @@ describe('Multiple users query mutation tests', function () {
       return userWithoutPassword
     })
 
+    const userListWithoutUserIdInAddresses = userListWithoutPasswords.map(
+      (user) => {
+        return {
+          ...user,
+          addresses: user.addresses.map(({ userId, ...adress }) => adress),
+        }
+      }
+    )
+
     const expectedResponse = {
-      userList: userListWithoutPasswords,
+      userList: userListWithoutUserIdInAddresses,
       totalResults: 10,
       hasUsersBefore: false,
       hasUsersAfter: false,
@@ -176,11 +184,20 @@ describe('Multiple users query mutation tests', function () {
       return userWithoutPassword
     })
 
+    const userListWithoutUserIdInAddresses = userListWithoutPasswords.map(
+      (user) => {
+        return {
+          ...user,
+          addresses: user.addresses.map(({ userId, ...adress }) => adress),
+        }
+      }
+    )
+
     const expectedResponse = {
       userList: [
-        userListWithoutPasswords[0],
-        userListWithoutPasswords[1],
-        userListWithoutPasswords[2],
+        userListWithoutUserIdInAddresses[0],
+        userListWithoutUserIdInAddresses[1],
+        userListWithoutUserIdInAddresses[2],
       ],
       totalResults: 10,
       hasUsersBefore: false,
@@ -223,11 +240,20 @@ describe('Multiple users query mutation tests', function () {
       return userWithoutPassword
     })
 
+    const userListWithoutUserIdInAddresses = userListWithoutPasswords.map(
+      (user) => {
+        return {
+          ...user,
+          addresses: user.addresses.map(({ userId, ...adress }) => adress),
+        }
+      }
+    )
+
     const expectedResponse = {
       userList: [
-        userListWithoutPasswords[3],
-        userListWithoutPasswords[4],
-        userListWithoutPasswords[5],
+        userListWithoutUserIdInAddresses[3],
+        userListWithoutUserIdInAddresses[4],
+        userListWithoutUserIdInAddresses[5],
       ],
       totalResults: 10,
       hasUsersBefore: true,
@@ -270,11 +296,20 @@ describe('Multiple users query mutation tests', function () {
       return userWithoutPassword
     })
 
+    const userListWithoutUserIdInAddresses = userListWithoutPasswords.map(
+      (user) => {
+        return {
+          ...user,
+          addresses: user.addresses.map(({ userId, ...adress }) => adress),
+        }
+      }
+    )
+
     const expectedResponse = {
       userList: [
-        userListWithoutPasswords[6],
-        userListWithoutPasswords[7],
-        userListWithoutPasswords[8],
+        userListWithoutUserIdInAddresses[6],
+        userListWithoutUserIdInAddresses[7],
+        userListWithoutUserIdInAddresses[8],
       ],
       totalResults: 10,
       hasUsersBefore: true,
@@ -317,8 +352,17 @@ describe('Multiple users query mutation tests', function () {
       return userWithoutPassword
     })
 
+    const userListWithoutUserIdInAddresses = userListWithoutPasswords.map(
+      (user) => {
+        return {
+          ...user,
+          addresses: user.addresses.map(({ userId, ...adress }) => adress),
+        }
+      }
+    )
+
     const expectedResponse = {
-      userList: [userListWithoutPasswords[9]],
+      userList: [userListWithoutUserIdInAddresses[9]],
       totalResults: 10,
       hasUsersBefore: true,
       hasUsersAfter: false,

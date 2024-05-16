@@ -42,9 +42,7 @@ export const typeDefs = `#graphql
       complement: String
       neighborhood: String!
       city: String!
-      state: String!
-      userId: Int!
-      user: User!    
+      state: String!   
     }
 
     input UserInput {
