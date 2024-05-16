@@ -21,13 +21,13 @@ describe('Relation between users and addresses tests', function () {
         state: 'State 1',
       },
       {
-        cep: '12345678',
-        street: 'Street 1',
-        streetNumber: 1,
+        cep: '87654321',
+        street: 'Street 2',
+        streetNumber: 2,
         complement: null,
-        neighborhood: 'Neighborhood 1',
-        city: 'City 1',
-        state: 'State 1',
+        neighborhood: 'Neighborhood 2',
+        city: 'City 2',
+        state: 'State 2',
       },
     ]
 
