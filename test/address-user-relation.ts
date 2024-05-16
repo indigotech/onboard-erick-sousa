@@ -51,7 +51,6 @@ describe('Relation between users and addresses tests', function () {
         userId: user.id,
       },
     })
-
     expect(foundAddresses[0].userId).to.be.eq(user.id)
     expect(foundAddresses[1].userId).to.be.eq(user.id)
   })

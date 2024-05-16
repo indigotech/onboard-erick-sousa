@@ -17,7 +17,6 @@ export const resolvers = {
       }
       const idInput = args.id
       const user = await findUserById(idInput)
-      console.log(user)
 
       if (!user) {
         throw new CustomError(

@@ -3,16 +3,44 @@ import { prisma } from '../src/setup-db'
 import { describe, it } from 'mocha'
 import gql from 'graphql-tag'
 import { print } from 'graphql/language/printer'
-import { expect } from 'chai'
+import { expect, use } from 'chai'
 import jwt from 'jsonwebtoken'
+import { create } from 'domain'
+import chaiExclude from 'chai-exclude'
 
 describe('user query mutation tests', function () {
+  use(chaiExclude)
+
+  const addresses = [
+    {
+      cep: '12345678',
+      street: 'Street 1',
+      streetNumber: 1,
+      complement: null,
+      neighborhood: 'Neighborhood 1',
+      city: 'City 1',
+      state: 'State 1',
+    },
+    {
+      cep: '87654321',
+      street: 'Street 2',
+      streetNumber: 2,
+      complement: null,
+      neighborhood: 'Neighborhood 2',
+      city: 'City 2',
+      state: 'State 2',
+    },
+  ]
+
   const correctUserInfo = {
     data: {
       name: 'test_name',
       email: 'test_emai1@gmail.com',
       password: 'test_password1',
       birthDate: '01-01-1900',
+      addresses: {
+        create: addresses[0],
+      },
     },
   }
 
@@ -22,6 +50,9 @@ describe('user query mutation tests', function () {
       email: 'authenticated@gmail.com',
       password: 'test_password1',
       birthDate: '01-01-1900',
+      addresses: {
+        create: addresses[1],
+      },
     },
   }
 
@@ -32,11 +63,21 @@ describe('user query mutation tests', function () {
         name
         email
         birthDate
+        addresses {
+          cep
+          street
+          streetNumber
+          complement
+          neighborhood
+          city
+          state
+        }
       }
     }
   `
 
   afterEach(async function () {
+    await prisma.address.deleteMany({})
     await prisma.user.deleteMany({})
   })
 
@@ -70,6 +111,7 @@ describe('user query mutation tests', function () {
       name: authenticatedUser.name,
       email: authenticatedUser.email,
       birthDate: authenticatedUser.birthDate,
+      addresses: [addresses[1]],
     }
 
     expect(response.data.data.user).to.be.deep.eq(expectedResponse)
@@ -107,6 +149,7 @@ describe('user query mutation tests', function () {
       name: searchedUser.name,
       email: searchedUser.email,
       birthDate: searchedUser.birthDate,
+      addresses: [addresses[0]],
     }
 
     expect(response.data.data.user).to.be.deep.eq(expectedResponse)
