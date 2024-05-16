@@ -6,89 +6,83 @@ import { print } from 'graphql/language/printer'
 import { expect, use } from 'chai'
 import chaiExclude from 'chai-exclude'
 import jwt from 'jsonwebtoken'
-import { faker } from '@faker-js/faker'
+import bcrypt from 'bcrypt'
 
-describe('Multiple users query mutation tests', function () {
-  use(chaiExclude)
+async function setupDatabase(userList, addressList) {
+  let password: string
 
-  const userList = {
-    data: [
-      {
-        name: 'Adler Alves',
-        email: 'Tommie.Medhurst@gmail.com',
-        birthDate: '16-11-1962',
-        password:
-          '$2b$10$5ss0lvGtJIAzKT2ipK35ueAiYBN1Kccd3YJSVgx2WKhWkDM4Udm3e',
-      },
-      {
-        name: 'Bernardete Barros',
-        email: 'Princess.Kiehn52@gmail.com',
-        birthDate: '04-11-1959',
-        password:
-          '$2b$10$DOCXYkeO0QJoOV6mVl94F.CSPla8gMSDXLIIDVKcmptP5MvMslYMG',
-      },
-      {
-        name: 'Claudia Leite',
-        email: 'Daren.Roob0@yahoo.com',
-        birthDate: '01-12-1997',
-        password:
-          '$2b$10$aCBOjaCD2aU8GXIs9Ivia.NWz3iKdXnwO0kXEUCNhQwuyVq9ViX/2',
-      },
-      {
-        name: 'Daniel Almeida',
-        email: 'Jeremie.Bernhard@hotmail.com',
-        birthDate: '28-08-1976',
-        password:
-          '$2b$10$jWb2pfXapMReEI6cqYqVqORg0R9s7H7TNS7iC.W.mz47kt7nbV3Xi',
-      },
-      {
-        name: 'Erick Sousa',
-        email: 'Shyann.Davis20@yahoo.com',
-        birthDate: '12-03-1961',
-        password:
-          '$2b$10$li3MOizIuHQ0gEDF3glM..M2pScu0u2AUntgrynpyg39IR1a.ELHO',
-      },
-      {
-        name: 'Felipe Kalume',
-        email: 'Sedrick.Halvorson19@yahoo.com',
-        birthDate: '22-06-1991',
-        password:
-          '$2b$10$mFRG4CdITKnnij3u/ldlseAC644ENbrdUj.QwKLXO5UTPKkusjMUm',
-      },
-      {
-        name: 'Gabriel Engler',
-        email: 'Obie_Terry85@hotmail.com',
-        birthDate: '04-07-1967',
-        password:
-          '$2b$10$4MUrEPoD.lblZjDWTn8V7.cRZaRyQD6G1HzGqo1Zq74dsJeYp3ofW',
-      },
-      {
-        name: 'Heitor Mascarenhas',
-        email: 'Wyman_Auer@yahoo.com',
-        birthDate: '09-01-1990',
-        password:
-          '$2b$10$kbg91w4/b0PIumY8xL/tpORHmCQFpfUm7i./Rsb7slUmavDTl.SEa',
-      },
-      {
-        name: 'Italo John',
-        email: 'Kelsi_Lowe@hotmail.com',
-        birthDate: '14-01-1995',
-        password:
-          '$2b$10$o7P4MzxFIsvwFAddGMxoyuNGOib1w2xCmVEd.Qu7ggxmU0cpGtXd.',
-      },
-      {
-        name: 'Joao Almeida',
-        email: 'Alvera.MacGyver1@gmail.com',
-        birthDate: '15-04-2003',
-        password:
-          '$2b$10$.xwPoedPtimBYIadcMB0jeH4Hv8lBRWxq5ldWEluxcxwytP1BohJ2',
-      },
-    ],
+  const alphabeticNameList = [
+    'Adler Alves',
+    'Bernardete Barros',
+    'Claudia Leite',
+    'Daniel Junior',
+    'Erick Sousa',
+    'Felipe Gabriel',
+    'Gabriel Felipe',
+    'Heitor Nunes',
+    'Italo John',
+    'Joao da Silva',
+  ]
+
+  for (let i = 0; i < 10; i++) {
+    password = `taki_senha${i}`
+    const salt = await bcrypt.genSalt(10)
+    const passwordHash = await bcrypt.hash(password, salt)
+
+    userList.data[i] = {
+      name: alphabeticNameList[i],
+      email: `${alphabeticNameList[i]}@gmail.com`,
+      birthDate: `0${i}-0${i}-1980`,
+      password: passwordHash,
+    }
   }
 
   const reversedList = {
     data: [...userList.data].reverse(),
   }
+
+  await prisma.user.createMany(reversedList)
+
+  for (let i = 0; i < 10; i++) {
+    let foundUser = await prisma.user.findUnique({
+      where: {
+        email: `${alphabeticNameList[i]}@gmail.com`,
+      },
+    })
+
+    addressList[i] = {
+      cep: '12345678',
+      street: `Street ${i}`,
+      streetNumber: i,
+      complement: null,
+      neighborhood: `Neighborhood ${i}`,
+      city: `City ${i}`,
+      state: `State ${i}`,
+      userId: foundUser.id,
+    }
+
+    await prisma.address.create({
+      data: addressList[i],
+    })
+
+    userList.data[i] = {
+      ...userList.data[i],
+      addresses: [addressList[i]],
+    }
+  }
+}
+
+describe('Multiple users query mutation tests', function () {
+  use(chaiExclude)
+
+  let userList = {
+    data: [],
+  }
+  let addressList = []
+
+  beforeEach(async function () {
+    await setupDatabase(userList, addressList)
+  })
 
   const usersQuery = gql`
     query users($data: UsersInput!) {
@@ -98,6 +92,16 @@ describe('Multiple users query mutation tests', function () {
           name
           email
           birthDate
+          addresses {
+            userId
+            cep
+            city
+            complement
+            neighborhood
+            state
+            street
+            streetNumber
+          }
         }
         totalResults
         hasUsersBefore
@@ -107,12 +111,11 @@ describe('Multiple users query mutation tests', function () {
   `
 
   afterEach(async function () {
+    await prisma.address.deleteMany({})
     await prisma.user.deleteMany({})
   })
 
   it('Should fail due to lack of authentication', async function () {
-    await prisma.user.createMany(reversedList)
-
     const response = await axios.post('http://localhost:4000', {
       query: print(usersQuery),
       variables: {
@@ -128,8 +131,6 @@ describe('Multiple users query mutation tests', function () {
   })
 
   it('Should return all users on alphabetical order', async function () {
-    await prisma.user.createMany(reversedList)
-
     const userListWithoutPasswords = userList.data.map((user) => {
       const { password, ...userWithoutPassword } = user
       return userWithoutPassword
@@ -173,8 +174,6 @@ describe('Multiple users query mutation tests', function () {
   })
 
   it('Should return the first page (users 1-3 from 10 users)', async function () {
-    await prisma.user.createMany(reversedList)
-
     const userListWithoutPasswords = userList.data.map((user) => {
       const { password, ...userWithoutPassword } = user
       return userWithoutPassword
@@ -222,8 +221,6 @@ describe('Multiple users query mutation tests', function () {
   })
 
   it('Should return the second page (users 4-6 from 10 users)', async function () {
-    await prisma.user.createMany(reversedList)
-
     const userListWithoutPasswords = userList.data.map((user) => {
       const { password, ...userWithoutPassword } = user
       return userWithoutPassword
@@ -271,8 +268,6 @@ describe('Multiple users query mutation tests', function () {
   })
 
   it('Should return the third page (users 7-9 from 10 users)', async function () {
-    await prisma.user.createMany(reversedList)
-
     const userListWithoutPasswords = userList.data.map((user) => {
       const { password, ...userWithoutPassword } = user
       return userWithoutPassword
@@ -320,8 +315,6 @@ describe('Multiple users query mutation tests', function () {
   })
 
   it('Should return the fourth page (only 10th user from 10 users)', async function () {
-    await prisma.user.createMany(reversedList)
-
     const userListWithoutPasswords = userList.data.map((user) => {
       const { password, ...userWithoutPassword } = user
       return userWithoutPassword
@@ -365,8 +358,6 @@ describe('Multiple users query mutation tests', function () {
   })
 
   it('Should return an empty page', async function () {
-    await prisma.user.createMany(reversedList)
-
     const expectedResponse = {
       userList: [],
       totalResults: 10,
@@ -405,8 +396,6 @@ describe('Multiple users query mutation tests', function () {
   })
 
   it('Should fail due to negative skip', async function () {
-    await prisma.user.createMany(reversedList)
-
     const payload = {
       id: 10000,
       email: 'payload_email@gmail.com',
@@ -437,8 +426,6 @@ describe('Multiple users query mutation tests', function () {
   })
 
   it('Should fail due to less the one users per page request', async function () {
-    await prisma.user.createMany(reversedList)
-
     const payload = {
       id: 10000,
       email: 'payload_email@gmail.com',
