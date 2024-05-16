@@ -7,74 +7,9 @@ import { expect } from 'chai'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 
-async function setupDatabase(userList, addressList) {
-  let password: string
-
-  const alphabeticNameList = [
-    'Adler Alves',
-    'Bernardete Barros',
-    'Claudia Leite',
-    'Daniel Junior',
-    'Erick Sousa',
-    'Felipe Gabriel',
-    'Gabriel Felipe',
-    'Heitor Nunes',
-    'Italo John',
-    'Joao da Silva',
-  ]
-
-  for (let i = 0; i < 10; i++) {
-    password = `taki_senha${i}`
-    const salt = await bcrypt.genSalt(2)
-    const passwordHash = await bcrypt.hash(password, salt)
-
-    userList.data[i] = {
-      name: alphabeticNameList[i],
-      email: `${alphabeticNameList[i]}@gmail.com`,
-      birthDate: `0${i}-0${i}-1980`,
-      password: passwordHash,
-    }
-  }
-
-  const reversedList = {
-    data: [...userList.data].reverse(),
-  }
-
-  await prisma.user.createMany(reversedList)
-
-  const foundUsers = await prisma.user.findMany()
-
-  for (let i = 0; i < 10; i++) {
-    addressList[i] = {
-      cep: '12345678',
-      street: `Street ${i}`,
-      streetNumber: i,
-      complement: null,
-      neighborhood: `Neighborhood ${i}`,
-      city: `City ${i}`,
-      state: `State ${i}`,
-      userId: foundUsers[9 - i].id,
-    }
-
-    userList.data[i] = {
-      ...userList.data[i],
-      addresses: [addressList[i]],
-    }
-  }
-
-  await prisma.address.createMany({
-    data: addressList,
-  })
-}
-
 describe('Multiple users query mutation tests', function () {
-  let userList = {
-    data: [],
-  }
-  let addressList = []
-
   beforeEach(async function () {
-    await setupDatabase(userList, addressList)
+    await setupDatabase()
   })
 
   const usersQuery = gql`
@@ -490,4 +425,69 @@ describe('Multiple users query mutation tests', function () {
     expect(response.data.data).to.be.null
     expect(response.data.errors[0].message).to.be.eq('Solicitação inválida')
   })
+
+  let userList = {
+    data: [],
+  }
+  let addressList = []
+
+  async function setupDatabase() {
+    let password: string
+
+    const alphabeticNameList = [
+      'Adler Alves',
+      'Bernardete Barros',
+      'Claudia Leite',
+      'Daniel Junior',
+      'Erick Sousa',
+      'Felipe Gabriel',
+      'Gabriel Felipe',
+      'Heitor Nunes',
+      'Italo John',
+      'Joao da Silva',
+    ]
+  
+    for (let i = 0; i < 10; i++) {
+      password = `taki_senha${i}`
+      const salt = await bcrypt.genSalt(2)
+      const passwordHash = await bcrypt.hash(password, salt)
+  
+      userList.data[i] = {
+        name: alphabeticNameList[i],
+        email: `${alphabeticNameList[i]}@gmail.com`,
+        birthDate: `0${i}-0${i}-1980`,
+        password: passwordHash,
+      }
+    }
+  
+    const reversedList = {
+      data: [...userList.data].reverse(),
+    }
+  
+    await prisma.user.createMany(reversedList)
+  
+    const foundUsers = await prisma.user.findMany()
+  
+    for (let i = 0; i < 10; i++) {
+      addressList[i] = {
+        cep: '12345678',
+        street: `Street ${i}`,
+        streetNumber: i,
+        complement: null,
+        neighborhood: `Neighborhood ${i}`,
+        city: `City ${i}`,
+        state: `State ${i}`,
+        userId: foundUsers[9 - i].id,
+      }
+  
+      userList.data[i] = {
+        ...userList.data[i],
+        addresses: [addressList[i]],
+      }
+    }
+  
+    await prisma.address.createMany({
+      data: addressList,
+    })
+  }
 })
