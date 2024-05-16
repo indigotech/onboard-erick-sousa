@@ -1,10 +1,11 @@
-import axios from 'axios'
 import { prisma } from '../src/setup-db'
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
+import bcrypt from 'bcrypt'
 
-describe('hello query tests', function () {
+describe('Relation between users and addresses tests', function () {
   afterEach(async function () {
+    await prisma.address.deleteMany({})
     await prisma.user.deleteMany({})
   })
 
@@ -30,17 +31,28 @@ describe('hello query tests', function () {
       },
     ]
 
+    const salt = await bcrypt.genSalt(10)
+    const passwordHash = await bcrypt.hash('test_user_adress', salt)
+
     const user = await prisma.user.create({
       data: {
         name: 'Taki User',
         email: 'taki@teste.com',
-        password:
-          '$2b$10$li3MOizIuHQ0gEDF3glM..M2pScu0u2AUntgrynpyg39IR1a.ELHO',
+        password: passwordHash,
         birthDate: '01-01-1950',
         addresses: {
           create: addresses,
         },
       },
     })
+
+    const foundAddresses = await prisma.address.findMany({
+      where: {
+        userId: user.id,
+      },
+    })
+
+    expect(foundAddresses[0].userId).to.be.eq(user.id)
+    expect(foundAddresses[1].userId).to.be.eq(user.id)
   })
 })

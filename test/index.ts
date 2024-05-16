@@ -5,6 +5,7 @@ import { prisma } from '../src/setup-db'
 
 before(async function () {
   await setup()
+  await prisma.address.deleteMany({})
   await prisma.user.deleteMany({})
 })
 after(async function () {
@@ -16,3 +17,4 @@ import './create-user'
 import './login'
 import './user-query'
 import './users-query'
+import './address-user-relation'
