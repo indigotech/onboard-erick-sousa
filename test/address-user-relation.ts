@@ -31,7 +31,7 @@ describe('Relation between users and addresses tests', function () {
       },
     ]
 
-    const salt = await bcrypt.genSalt(10)
+    const salt = await bcrypt.genSalt(2)
     const passwordHash = await bcrypt.hash('test_user_adress', salt)
 
     const user = await prisma.user.create({
@@ -51,7 +51,6 @@ describe('Relation between users and addresses tests', function () {
         userId: user.id,
       },
     })
-
     expect(foundAddresses[0].userId).to.be.eq(user.id)
     expect(foundAddresses[1].userId).to.be.eq(user.id)
   })

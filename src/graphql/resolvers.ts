@@ -51,6 +51,9 @@ export const resolvers = {
         orderBy: {
           name: 'asc',
         },
+        include: {
+          addresses: true,
+        },
         skip: skippedUsers,
         take: usersPerPage,
       })
@@ -229,6 +232,9 @@ async function findUserById(idInput) {
   const user = await prisma.user.findUnique({
     where: {
       id: parseInt(idInput),
+    },
+    include: {
+      addresses: true,
     },
   })
 

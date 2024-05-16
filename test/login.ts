@@ -40,7 +40,7 @@ describe('login mutation tests', function () {
       },
     }
 
-    const salt = await bcrypt.genSalt(10)
+    const salt = await bcrypt.genSalt(2)
     const passwordHash = await bcrypt.hash(toBeCreatedUser.data.password, salt)
 
     const createUserResponse = await prisma.user.create({
@@ -97,7 +97,7 @@ describe('login mutation tests', function () {
       },
     }
 
-    const salt = await bcrypt.genSalt(10)
+    const salt = await bcrypt.genSalt(2)
     const passwordHash = await bcrypt.hash(toBeCreatedUser.data.password, salt)
 
     const createUserResponse = await prisma.user.create({
@@ -154,7 +154,7 @@ describe('login mutation tests', function () {
       },
     }
 
-    const salt = await bcrypt.genSalt(10)
+    const salt = await bcrypt.genSalt(2)
     const passwordHash = await bcrypt.hash(createdUser.data.password, salt)
 
     await prisma.user.create({
@@ -195,7 +195,7 @@ describe('login mutation tests', function () {
       },
     }
 
-    const salt = await bcrypt.genSalt(10)
+    const salt = await bcrypt.genSalt(2)
     const passwordHash = await bcrypt.hash(createdUser.data.password, salt)
 
     await prisma.user.create({
