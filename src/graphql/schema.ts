@@ -41,8 +41,8 @@ export const typeDefs = `#graphql
     }
 
     input UsersInput {
-      usersPerPage: Int! 
-      skippedUsers: Int!
+      usersPerPage: Int = 10 
+      skippedUsers: Int = 0
     }
 
     type UsersResponse {
