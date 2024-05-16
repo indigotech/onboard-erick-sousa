@@ -42,13 +42,9 @@ async function setupDatabase(userList, addressList) {
 
   await prisma.user.createMany(reversedList)
 
-  for (let i = 0; i < 10; i++) {
-    let foundUser = await prisma.user.findUnique({
-      where: {
-        email: `${alphabeticNameList[i]}@gmail.com`,
-      },
-    })
+  const foundUsers = await prisma.user.findMany()
 
+  for (let i = 0; i < 10; i++) {
     addressList[i] = {
       cep: '12345678',
       street: `Street ${i}`,
@@ -57,18 +53,18 @@ async function setupDatabase(userList, addressList) {
       neighborhood: `Neighborhood ${i}`,
       city: `City ${i}`,
       state: `State ${i}`,
-      userId: foundUser.id,
+      userId: foundUsers[9 - i].id,
     }
-
-    await prisma.address.create({
-      data: addressList[i],
-    })
 
     userList.data[i] = {
       ...userList.data[i],
       addresses: [addressList[i]],
     }
   }
+
+  await prisma.address.createMany({
+    data: addressList,
+  })
 }
 
 describe('Multiple users query mutation tests', function () {
