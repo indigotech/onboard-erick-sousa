@@ -9,7 +9,6 @@ import jwt from 'jsonwebtoken'
 import { faker } from '@faker-js/faker'
 
 describe('Multiple users query mutation tests', function () {
-
   use(chaiExclude)
 
   const userList = {

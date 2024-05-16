@@ -31,6 +31,20 @@ export const typeDefs = `#graphql
       name: String!
       email: String!
       birthDate: String
+      addresses: [Address!]!
+    }
+
+    type Address {
+      id: ID!     
+      cep: String!
+      street: String!
+      streetNumber: Int!
+      complement: String
+      neighborhood: String!
+      city: String!
+      state: String!
+      userId: Int!
+      user: User!    
     }
 
     input UserInput {

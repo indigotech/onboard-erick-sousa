@@ -17,6 +17,7 @@ export const resolvers = {
       }
       const idInput = args.id
       const user = await findUserById(idInput)
+      console.log(user)
 
       if (!user) {
         throw new CustomError(
@@ -50,6 +51,9 @@ export const resolvers = {
       const users = await prisma.user.findMany({
         orderBy: {
           name: 'asc',
+        },
+        include: {
+          addresses: true,
         },
         skip: skippedUsers,
         take: usersPerPage,
@@ -229,6 +233,9 @@ async function findUserById(idInput) {
   const user = await prisma.user.findUnique({
     where: {
       id: parseInt(idInput),
+    },
+    include: {
+      addresses: true,
     },
   })
 
