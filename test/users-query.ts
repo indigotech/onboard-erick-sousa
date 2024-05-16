@@ -3,8 +3,7 @@ import { prisma } from '../src/setup-db'
 import { describe, it } from 'mocha'
 import gql from 'graphql-tag'
 import { print } from 'graphql/language/printer'
-import { expect, use } from 'chai'
-import chaiExclude from 'chai-exclude'
+import { expect } from 'chai'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 
@@ -73,8 +72,6 @@ async function setupDatabase(userList, addressList) {
 }
 
 describe('Multiple users query mutation tests', function () {
-  use(chaiExclude)
-
   let userList = {
     data: [],
   }

@@ -3,13 +3,10 @@ import { prisma } from '../src/setup-db'
 import { describe, it } from 'mocha'
 import gql from 'graphql-tag'
 import { print } from 'graphql/language/printer'
-import { expect, use } from 'chai'
+import { expect } from 'chai'
 import jwt from 'jsonwebtoken'
-import chaiExclude from 'chai-exclude'
 
 describe('user query mutation tests', function () {
-  use(chaiExclude)
-
   const addresses = [
     {
       cep: '12345678',
