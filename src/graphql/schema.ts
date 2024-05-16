@@ -7,6 +7,7 @@ export const typeDefs = `#graphql
     type Query {
       hello: [SimpleText]
       user(id: ID!): User!
+      users(data: UsersInput!): UsersResponse!
     }
 
     type Mutation  {
@@ -37,6 +38,18 @@ export const typeDefs = `#graphql
       email: String!
       password: String!
       birthDate: String 
+    }
+
+    input UsersInput {
+      usersPerPage: Int = 10 
+      skippedUsers: Int = 0
+    }
+
+    type UsersResponse {
+      userList: [User!]!
+      totalResults: Int!
+      hasUsersBefore: Boolean!
+      hasUsersAfter: Boolean!
     }
   `
 

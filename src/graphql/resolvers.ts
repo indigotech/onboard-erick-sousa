@@ -28,6 +28,43 @@ export const resolvers = {
 
       return user
     },
+    users: async (_, args, contextValue) => {
+      const token = contextValue.token
+      if (!token || !isTokenValid(token)) {
+        throw new CustomError('Usuário não autenticado', 400)
+      }
+
+      const usersPerPage = args.data.usersPerPage
+      const skippedUsers = args.data.skippedUsers
+
+      if (usersPerPage < 1 || skippedUsers < 0) {
+        throw new CustomError(
+          'Solicitação inválida',
+          400,
+          'There must be at least one user per page and you cant skip a negative number (there is no backwards pagination)'
+        )
+      }
+
+      const totalUsers = await prisma.user.count()
+
+      const users = await prisma.user.findMany({
+        orderBy: {
+          name: 'asc',
+        },
+        skip: skippedUsers,
+        take: usersPerPage,
+      })
+
+      const hasUsersBefore: boolean = skippedUsers !== 0
+      const hasUsersAfter: boolean = skippedUsers + usersPerPage < totalUsers
+
+      return {
+        userList: users,
+        totalResults: totalUsers,
+        hasUsersBefore: hasUsersBefore,
+        hasUsersAfter: hasUsersAfter,
+      }
+    },
   },
   Mutation: {
     createUser: async (_, args, contextValue) => {
