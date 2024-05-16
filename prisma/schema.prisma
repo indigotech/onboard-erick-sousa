@@ -1,16 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource DAS_server_db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  name      String
+  birthDate String?
+  password  String
+  addresses Address[]
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String
-  password String
-  birthDate String?
+model Address {
+  id           Int     @id @default(autoincrement())
+  cep          String
+  street       String
+  streetNumber Int
+  complement   String?
+  neighborhood String
+  city         String
+  state        String
+  userId       Int
+  user         User    @relation(fields: [userId], references: [id])
+
+  @@index([userId])
 }
